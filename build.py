@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """把仓库里的脚本打成 encrypted 目录中的加密副本。分享时只发这个目录。"""
 
+import json
 import os
 import re
 import shutil
@@ -44,6 +45,44 @@ def env_banner(text, filename):
     return "/*\n%s\n*/\n" % body
 
 
+def author_constants():
+    path = os.path.join(ROOT, "author_invite.py")
+    namespace = {}
+    with open(path, "r", encoding="utf-8") as handle:
+        exec(compile(handle.read(), path, "exec"), namespace)
+    return namespace
+
+
+def inline_author_invite(text):
+    """打包时把邀请码写进密文。分享目录里不再放可改的 author_invite.py。"""
+    if "author_invite" not in text:
+        return text
+    namespace = author_constants()
+
+    def assign(raw):
+        lines = []
+        for name in re.findall(r"[A-Z][A-Z0-9_]*", raw):
+            if name not in namespace:
+                raise SystemExit("author_invite.py 缺少 %s" % name)
+            lines.append("%s = %s" % (name, json.dumps(namespace[name], ensure_ascii=False)))
+        return "\n".join(lines)
+
+    text = re.sub(
+        r"from author_invite import \(\s*.*?\s*\)",
+        lambda match: assign(match.group(0)),
+        text,
+        flags=re.S,
+    )
+    text = re.sub(
+        r"from author_invite import [A-Za-z0-9_, \t]+",
+        lambda match: assign(match.group(0)),
+        text,
+    )
+    if re.search(r"(?:from|import)\s+author_invite\b", text):
+        raise SystemExit("还有脚本在引用 author_invite，不能打成明文")
+    return text
+
+
 def write_payload(rel, data):
     dest = os.path.join(PAYLOAD, rel + ".bin")
     os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -80,7 +119,7 @@ def rebuild():
             scripts.append(name)
     for name in scripts:
         src = os.path.join(ROOT, name)
-        text = open(src, "r", encoding="utf-8").read()
+        text = inline_author_invite(open(src, "r", encoding="utf-8").read())
         write_payload(name, text.encode("utf-8"))
         banner = env_banner(text, name)
         loader = python_loader(name, banner) if name.endswith(".py") else js_loader(name, banner)
@@ -106,8 +145,9 @@ def rebuild():
             handle.write(loader)
     for name in VENDOR:
         shutil.copy2(os.path.join(ROOT, "utils", name), os.path.join(UTILS, name))
-    # 作者邀请码要给加密后的脚本 import，不能打进密文。
-    shutil.copy2(os.path.join(ROOT, "author_invite.py"), os.path.join(HERE, "author_invite.py"))
+    leftover = os.path.join(HERE, "author_invite.py")
+    if os.path.isfile(leftover):
+        os.remove(leftover)
     shutil.copy2(os.path.join(ROOT, "proxy_pool.py"), os.path.join(HERE, "proxy_pool.py"))
     shutil.copy2(os.path.join(ROOT, "utils", "proxy_pool.js"), os.path.join(UTILS, "proxy_pool.js"))
     write_js_boot()
@@ -157,7 +197,9 @@ def check_roundtrip(_name):
             blob_path = os.path.join(dirpath, name)
             rel = os.path.relpath(blob_path, PAYLOAD).replace("\\", "/")[: -len(".bin")]
             plain = decrypt(KEY, open(blob_path, "rb").read()).decode("utf-8")
-            original = open(os.path.join(ROOT, rel.replace("/", os.sep)), "r", encoding="utf-8").read()
+            original = inline_author_invite(
+                open(os.path.join(ROOT, rel.replace("/", os.sep)), "r", encoding="utf-8").read()
+            )
             if plain != original:
                 raise SystemExit("回读校验失败: " + rel)
     proc = subprocess.run(
