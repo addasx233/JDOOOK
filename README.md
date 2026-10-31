@@ -5,7 +5,7 @@
 | jd_jdjx.py            | 京东惊喜           |
 | jd_qyzxld.py          | 权益中心领豆         |
 | jd_jdtj.py            | 京东特价           |
-| jd_mobileFarm.py      | 东东农场           |
+| jd_mobileFarm.py      | 东东农场(收前两个助力)           |
 | jd_nczp.py            | 东东农场转盘 |
 | jd_sjds.py            | 晒家大赛           |
 | jd_ttgjd.py           | 天天刮京豆          |
@@ -42,19 +42,34 @@
 
 东东农场、京东特价、权益中心领豆、京东惊喜和天天刮京豆的签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
 
-在青龙容器里，进入本仓库目录执行（依赖管理里选 Linux 也是这条）：
+在宿主机上手动安装。`容器名称` 换成自己的青龙容器，常见是 `qinglong`。仓库目录换成面板里拉下来的文件夹，一般在 `/ql/data/scripts/` 下面。
 
 ```shell
-sh 安装依赖.sh
+docker exec -it 容器名称 bash
 ```
 
-脚本会安装 Chromium、Xvfb、字体、Python 的 `requests` 和 `prettytable`，以及排行榜脚本用的 `axios`。
+进容器后进入仓库目录，再执行：
+
+```shell
+cd /ql/data/scripts/仓库目录
+apk add --no-cache python3 py3-requests nodejs chromium xvfb ttf-freefont font-noto
+python3 -m pip install --break-system-packages prettytable
+npm install axios
+```
+
+`apk` 会装上 Python、Node、Chromium、Xvfb、字体和 `requests`。`prettytable` 给豆子统计用，`axios` 给排行榜做任务用，要在仓库目录里装。旧版 pip 不认识 `--break-system-packages` 时，去掉这个参数再装一次。也可以改成执行 `sh 安装依赖.sh`。
 
 | 包 | 作用 |
 | --- | --- |
 | `chromium` | 浏览器 |
 | `xvfb` | 虚拟显示 |
 | `ttf-freefont`、`font-noto` | 字体 |
+
+拉库前改青龙配置文件，加上 `sh` 和加密脚本的 `bin`：
+
+```shell
+RepoFileExtensions="js py sh bin"
+```
 
 拉库时只给 `jd_` 开头的脚本加定时任务，`utils` 只作为依赖文件：
 
