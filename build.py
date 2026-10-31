@@ -29,6 +29,8 @@ OWN_UTILS = (
     "get_h5st.js",
     "get_h5st.py",
 )
+# 活动脚本会 import 这些文件。打进密文，分享目录不留明文，由 _boot 按需解密。
+SHARED = ("account_common.py",)
 
 
 def env_banner(text, filename):
@@ -125,6 +127,13 @@ def rebuild():
         loader = python_loader(name, banner) if name.endswith(".py") else js_loader(name, banner)
         with open(os.path.join(HERE, name), "w", encoding="utf-8", newline="\n") as handle:
             handle.write(loader)
+    for name in SHARED:
+        src = os.path.join(ROOT, name)
+        text = open(src, "r", encoding="utf-8").read()
+        write_payload(name, text.encode("utf-8"))
+        leftover = os.path.join(HERE, name)
+        if os.path.isfile(leftover):
+            os.remove(leftover)
     for name in OWN_UTILS:
         src = os.path.join(ROOT, "utils", name)
         text = open(src, "r", encoding="utf-8").read()

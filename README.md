@@ -3,9 +3,10 @@
 | 脚本                    | 活动             |
 | --------------------- | -------------- |
 | jd_jdjx.py            | 京东惊喜           |
+| jd_jyzs.py            | 交易指数           |
 | jd_qyzxld.py          | 权益中心领豆         |
 | jd_jdtj.py            | 京东特价           |
-| jd_mobileFarm.py      | 东东农场(收前两个助力)           |
+| jd_mobileFarm.py      | 东东农场           |
 | jd_nczp.py            | 东东农场转盘 |
 | jd_sjds.py            | 晒家大赛           |
 | jd_ttgjd.py           | 天天刮京豆          |
@@ -20,7 +21,7 @@
 | `FARM_ASSIST_PRIORITY` | 可选，只给东东农场用。优先被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。每个号最多助力 3 次，前 2 个号先助力作者，然后按这个名单，不够再随机帮其他号。 |
 | `FARM_BROWSER` | 可选。Chrome / Chromium / Edge 的可执行文件路径。不填就自动找。 |
 | `JD_UA` | 可选。请求用的 User-Agent，不填用脚本内置的京东 App UA。 |
-| `JD_UUID` | 可选。设备 uuid。京东惊喜、京东特价、权益中心领豆会读，不填用脚本内置值。 |
+| `JD_UUID` | 可选。设备 uuid。京东惊喜、交易指数、京东特价、权益中心领豆会读，不填用脚本内置值。 |
 | `JD_WG_SDK_TOKEN` | 可选。东东农场、东东农场转盘的 `wg-sdk-token`，不填用脚本内置值。 |
 | `JD_H5ST_CMD` | 可选。外部签名程序。stdin 一行 JSON，stdout 一行 h5st。晒家大赛、东东农场转盘、京东特价会读。 |
 | `JD_EID_TOKEN` | 可选，只给晒家大赛用，作为 `x-api-eid-token`。走浏览器签名的脚本不用填。 |
@@ -31,6 +32,7 @@
 | 脚本                    | 依赖                                      |
 | --------------------- | --------------------------------------- |
 | jd_jdjx.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
+| jd_jyzs.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_qyzxld.py          | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_jdtj.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_mobileFarm.py      | Python `requests`、Node、Chromium、Xvfb、字体 |
@@ -40,7 +42,7 @@
 | jd_beans_7days_new.py | Python `requests`                       |
 | jd_rankVote.js        | Node `axios`                            |
 
-东东农场、京东特价、权益中心领豆、京东惊喜和天天刮京豆的签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
+东东农场、京东特价、权益中心领豆、京东惊喜、交易指数和天天刮京豆的签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
 
 在宿主机上手动安装。`容器名称` 换成自己的青龙容器，常见是 `qinglong`。仓库目录换成面板里拉下来的文件夹，一般在 `/ql/data/scripts/` 下面。
 
