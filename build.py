@@ -28,6 +28,7 @@ OWN_UTILS = (
     "h5st_5_3.js",
     "get_h5st.js",
     "get_h5st.py",
+    "ja4_client.py",
 )
 # 活动脚本会 import 这些文件。打进密文，分享目录不留明文，由 _boot 按需解密。
 SHARED = ("account_common.py",)

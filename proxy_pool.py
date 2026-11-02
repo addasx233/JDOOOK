@@ -85,8 +85,12 @@ class ProxyPool:
                 kwargs.pop("proxies", None)
             if str(url).lower().startswith("https://"):
                 folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "utils")
-                if os.path.isfile(os.path.join(folder, "ja4_client.py")) and folder not in sys.path:
-                    sys.path.insert(0, folder)
+                source = os.path.join(folder, "ja4_client.py")
+                if os.path.isfile(source) and folder not in sys.path:
+                    with open(source, "r", encoding="utf-8") as handle:
+                        head = handle.read(400)
+                    if "from _boot import run" not in head:
+                        sys.path.insert(0, folder)
                 from ja4_client import request as ja4_request
                 return ja4_request(method, url, **kwargs)
             return requests.request(method, url, **kwargs)
