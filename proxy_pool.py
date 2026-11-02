@@ -5,6 +5,7 @@ import os
 import re
 import select
 import socket
+import sys
 import threading
 
 import requests
@@ -82,6 +83,12 @@ class ProxyPool:
                 kwargs["proxies"] = proxy
             else:
                 kwargs.pop("proxies", None)
+            if str(url).lower().startswith("https://"):
+                folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "utils")
+                if os.path.isfile(os.path.join(folder, "ja4_client.py")) and folder not in sys.path:
+                    sys.path.insert(0, folder)
+                from ja4_client import request as ja4_request
+                return ja4_request(method, url, **kwargs)
             return requests.request(method, url, **kwargs)
 
         return self.attempt(once)

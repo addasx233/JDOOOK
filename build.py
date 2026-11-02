@@ -31,6 +31,9 @@ OWN_UTILS = (
 )
 # 活动脚本会 import 这些文件。打进密文，分享目录不留明文，由 _boot 按需解密。
 SHARED = ("account_common.py",)
+# 源码放在 utils，导入名仍是 ja4_client。
+JA4_SOURCE = os.path.join("utils", "ja4_client.py")
+JA4_MODULE = "ja4_client.py"
 
 
 def env_banner(text, filename):
@@ -134,6 +137,14 @@ def rebuild():
         leftover = os.path.join(HERE, name)
         if os.path.isfile(leftover):
             os.remove(leftover)
+    ja4_src = os.path.join(ROOT, JA4_SOURCE)
+    write_payload(JA4_MODULE, open(ja4_src, "r", encoding="utf-8").read().encode("utf-8"))
+    for leftover in (
+        os.path.join(HERE, JA4_MODULE),
+        os.path.join(UTILS, "ja4_client.py"),
+    ):
+        if os.path.isfile(leftover):
+            os.remove(leftover)
     for name in OWN_UTILS:
         src = os.path.join(ROOT, "utils", name)
         text = open(src, "r", encoding="utf-8").read()
@@ -206,8 +217,9 @@ def check_roundtrip(_name):
             blob_path = os.path.join(dirpath, name)
             rel = os.path.relpath(blob_path, PAYLOAD).replace("\\", "/")[: -len(".bin")]
             plain = decrypt(KEY, open(blob_path, "rb").read()).decode("utf-8")
+            source_rel = JA4_SOURCE if rel == JA4_MODULE else rel.replace("/", os.sep)
             original = inline_author_invite(
-                open(os.path.join(ROOT, rel.replace("/", os.sep)), "r", encoding="utf-8").read()
+                open(os.path.join(ROOT, source_rel), "r", encoding="utf-8").read()
             )
             if plain != original:
                 raise SystemExit("回读校验失败: " + rel)
