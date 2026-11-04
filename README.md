@@ -91,18 +91,19 @@ docker exec -it 容器名称 bash
 
 ```shell
 cd /ql/data/scripts/仓库目录
-apk add --no-cache python3 py3-requests nodejs chromium xvfb ttf-freefont font-noto
+apk add --no-cache python3 py3-requests nodejs chromium xvfb ttf-freefont font-noto libssl3
 python3 -m pip install --break-system-packages prettytable
 npm install axios
 ```
 
-`apk` 会装上 Python、Node、Chromium、Xvfb、字体和 `requests`。`prettytable` 给豆子统计用，`axios` 给排行榜做任务用，要在仓库目录里装。旧版 pip 不认识 `--break-system-packages` 时，去掉这个参数再装一次。也可以改成执行 `sh 安装依赖.sh`。
+`apk` 会装上 Python、Node、Chromium、Xvfb、字体、OpenSSL 和 `requests`。`libssl3` 提供登录校验要用的 `libcrypto` 和 `libssl`。`prettytable` 给豆子统计用，`axios` 给排行榜做任务用，要在仓库目录里装。旧版 pip 不认识 `--break-system-packages` 时，去掉这个参数再装一次。也可以改成执行 `sh 安装依赖.sh`。
 
 | 包 | 作用 |
 | --- | --- |
 | `chromium` | 浏览器 |
 | `xvfb` | 虚拟显示 |
 | `ttf-freefont`、`font-noto` | 字体 |
+| `libssl3` | OpenSSL，登录校验用 |
 
 拉库只给 `jd_` 开头的脚本加定时任务。黑名单里的文件不会加定时，依赖文件仍会拷下来。青龙先按最后一个参数里的后缀过滤，再按白名单和依赖决定留哪些文件。
 
