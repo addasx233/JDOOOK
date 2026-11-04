@@ -20,7 +20,7 @@ iPhone 用 Stream 抓 `api.m.jd.com`，点右上角复制 cURL，整段贴进 `J
 
 `screen`、`openudid` 可以不写。没有 `openudid` 时用 `uuid`。`h5st` 每次请求现签，不写进缓存。
 
-系统版本只认这些：iOS 13、14–15、16–17、18–19、26，Android 10–16。
+系统版本只认这些：iOS 13、14–15、16–17、18–19、26–27，Android 10–16。iOS 27 先用 iOS 26 的 ClientHello。
 
 `JD_COOKIE` 可以是 HAR、curl，或用分号把上面的字段串起来。`User-Agent` 里面的分号不用转义，下一段以字段名加等号开头。多账号用 `&`、换行，或下一段直接以 `;pt_key=` 接上。只填 `pt_key` 和 `pt_pin` 时，用这个账号已有的缓存，没有或不全就跳过。
 
@@ -104,14 +104,10 @@ npm install axios
 | `xvfb` | 虚拟显示 |
 | `ttf-freefont`、`font-noto` | 字体 |
 
-拉库前改青龙配置文件，加上 `sh` 和加密脚本的 `bin`：
+拉库只给 `jd_` 开头的脚本加定时任务。黑名单里的文件不会加定时，依赖文件仍会拷下来。青龙先按最后一个参数里的后缀过滤，再按白名单和依赖决定留哪些文件。
 
 ```shell
-RepoFileExtensions="js py sh bin"
+ql repo https://github.com/addasx233/JDOOOK.git "jd_" "_boot|_aes|_key|_payload|proxy_pool|utils" "_boot|_aes|_key|_payload|proxy_pool|utils" "main" "py|js|bin"
 ```
 
-拉库时只给 `jd_` 开头的脚本加定时任务，`utils` 只作为依赖文件：
-
-```shell
-ql repo https://github.com/addasx233/JDOOOK.git "jd_" "_payload|utils" "_payload|_boot|_aes|_key|author_invite|proxy_pool|utils" "main" "py|js|bin"
-```
+这条会留下 `jd_` 入口，以及 `_boot.py`、`_boot.js`、`_aes.py`、`_key.py`、`proxy_pool.py`、`utils` 和 `_payload` 里的 `.bin`。邀请码已经写进密文，分享仓库里没有 `author_invite.py`。
