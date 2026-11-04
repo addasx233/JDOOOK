@@ -37,6 +37,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_sjq.py             | 手机圈            |
 | jd_qzqd.py            | 圈子签到           |
 | jd_qyzxld.py          | 权益中心领豆         |
+| jd_wyqdzx.py          | 网页签到中心         |
 | jd_jdtj.py            | 京东特价           |
 | jd_mobileFarm.py      | 东东农场           |
 | jd_nczp.py            | 东东农场转盘 |
@@ -49,7 +50,8 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 
 | 名称 | 作用 |
 | --- | --- |
-| `JD_COOKIE` | 必填。写法见上面的「账号必填」。 |
+| `JD_COOKIE` | 必填。写法见上面的「账号必填」。手机端脚本用，网页签到中心不读这个。 |
+| `WEBJD_COOKIE` | 只给网页签到中心用。www.jd.com 登录后的 Cookie，里面要有 `thor`。账号名用 `pin`，没有就用 `_pst`。多账号用 `&` 或换行。不认手机端 `pt_key`。 |
 | `FARM_ASSIST_PRIORITY` | 可选，只给东东农场用。优先被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。每个号最多助力 3 次，前 2 个号先助力作者，然后按这个名单，不够再随机帮其他号。 |
 | `FARM_BROWSER` | 可选。Chrome / Chromium / Edge 的可执行文件路径。不填就自动找。 |
 | `JD_H5ST_CMD` | 可选。外部签名程序。stdin 一行 JSON，stdout 一行 h5st。晒家大赛、东东农场转盘、京东特价会读。 |
@@ -66,6 +68,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_sjq.py             | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_qzqd.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_qyzxld.py          | Python `requests`、Node、Chromium、Xvfb、字体 |
+| jd_wyqdzx.py          | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_jdtj.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_mobileFarm.py      | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_nczp.py            | Python `requests`、Node                  |
@@ -76,7 +79,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 
 登录校验、Cookie 拆分和多账号重试在 `account_common.py`，它不是定时任务。加密后这份代码只在密文里，入口脚本由启动器加载。
 
-东东农场、京东特价、权益中心领豆、手机圈、圈子签到、京东惊喜、交易指数、快乐红包、手机馆和天天刮京豆的签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
+东东农场、京东特价、权益中心领豆、网页签到中心、手机圈、圈子签到、京东惊喜、交易指数、快乐红包、手机馆和天天刮京豆的签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
 
 在宿主机上手动安装。`容器名称` 换成自己的青龙容器，常见是 `qinglong`。仓库目录换成面板里拉下来的文件夹，一般在 `/ql/data/scripts/` 下面。
 

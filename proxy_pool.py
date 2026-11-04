@@ -77,13 +77,16 @@ class ProxyPool:
         return self.request("get", url, **kwargs)
 
     def request(self, method, url, **kwargs):
+        # 网页签到没有手机抓包，plain=True 走普通 HTTPS，不套 JA4。
+        plain = bool(kwargs.pop("plain", False))
+
         def once():
             proxy = self.proxies()
             if proxy:
                 kwargs["proxies"] = proxy
             else:
                 kwargs.pop("proxies", None)
-            if str(url).lower().startswith("https://"):
+            if str(url).lower().startswith("https://") and not plain:
                 folder = os.path.join(os.path.dirname(os.path.abspath(__file__)), "utils")
                 source = os.path.join(folder, "ja4_client.py")
                 if os.path.isfile(source) and folder not in sys.path:
