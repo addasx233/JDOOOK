@@ -31,6 +31,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | 脚本                    | 活动             |
 | --------------------- | -------------- |
 | jd_jdjx.py            | 京东惊喜           |
+| jd_jdms.py            | 京东秒杀           |
 | jd_jyzs.py            | 交易指数           |
 | jd_klhb.py            | 快乐红包           |
 | jd_sjg.py             | 手机馆            |
@@ -62,6 +63,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | 脚本                    | 依赖                                      |
 | --------------------- | --------------------------------------- |
 | jd_jdjx.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
+| jd_jdms.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_jyzs.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_klhb.py            | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_sjg.py             | Python `requests`、Node、Chromium、Xvfb、字体 |
@@ -79,7 +81,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 
 登录校验、Cookie 拆分和多账号重试在 `account_common.py`，它不是定时任务。加密后这份代码只在密文里，入口脚本由启动器加载。
 
-东东农场、京东特价、权益中心领豆、网页签到中心、手机圈、圈子签到、京东惊喜、交易指数、快乐红包、手机馆和天天刮京豆的签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
+东东农场、京东特价、权益中心领豆、网页签到中心、手机圈、圈子签到、京东惊喜、京东秒杀、交易指数、快乐红包、手机馆和天天刮京豆的签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
 
 在宿主机上手动安装。`容器名称` 换成自己的青龙容器，常见是 `qinglong`。仓库目录换成面板里拉下来的文件夹，一般在 `/ql/data/scripts/` 下面。
 
