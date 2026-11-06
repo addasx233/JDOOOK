@@ -45,7 +45,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_sjds.py            | 晒家大赛           |
 | jd_ttgjd.py           | 天天刮京豆          |
 | jd_beans_7days_new.py | 豆子7天统计         |
-| jd_rankVote.js        | 排行榜做任务         |
+| jd_rankVote.py        | 排行榜做任务         |
 
 ## 环境变量
 
@@ -77,7 +77,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_sjds.py            | Python `requests`、Node                  |
 | jd_ttgjd.py           | Python `requests`、Node、Chromium、Xvfb、字体 |
 | jd_beans_7days_new.py | Python `requests`                       |
-| jd_rankVote.js        | Node `axios`                            |
+| jd_rankVote.py        | Python `requests`                       |
 
 登录校验、Cookie 拆分和多账号重试在 `account_common.py`，它不是定时任务。加密后这份代码只在密文里，入口脚本由启动器加载。
 
@@ -95,10 +95,9 @@ docker exec -it 容器名称 bash
 cd /ql/data/scripts/仓库目录
 apk add --no-cache python3 py3-requests nodejs chromium xvfb ttf-freefont font-noto libssl3
 python3 -m pip install --break-system-packages prettytable
-npm install axios
 ```
 
-`apk` 会装上 Python、Node、Chromium、Xvfb、字体、OpenSSL 和 `requests`。`libssl3` 提供登录校验要用的 `libcrypto` 和 `libssl`。`prettytable` 给豆子统计用，`axios` 给排行榜做任务用，要在仓库目录里装。旧版 pip 不认识 `--break-system-packages` 时，去掉这个参数再装一次。也可以改成执行 `sh 安装依赖.sh`。
+`apk` 会装上 Python、Node、Chromium、Xvfb、字体、OpenSSL 和 `requests`。`libssl3` 提供登录校验要用的 `libcrypto` 和 `libssl`。`prettytable` 给豆子统计用，要在仓库目录里装。旧版 pip 不认识 `--break-system-packages` 时，去掉这个参数再装一次。也可以改成执行 `sh 安装依赖.sh`。
 
 | 包 | 作用 |
 | --- | --- |
