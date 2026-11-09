@@ -2,6 +2,7 @@
 '''
 new Env('圈子签到');
 0 13 * * * jd_qzqd.py
+版本：20261109
 '''
 import os
 import sys

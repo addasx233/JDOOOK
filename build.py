@@ -40,11 +40,14 @@ JA4_MODULE = "ja4_client.py"
 def env_banner(text, filename):
     name = re.search(r"""new Env\(\s*['"](.+?)['"]\s*\)""", text)
     cron = re.search(r"(?m)^\s*(\d+\s+\d+\s+\*\s+\*\s+\*\s+\S+)", text)
+    version = re.search(r"版本：(\d{8})", text)
     if not name:
         return ""
     lines = ["new Env('%s');" % name.group(1)]
     if cron:
         lines.append(cron.group(1))
+    if version:
+        lines.append("版本：%s" % version.group(1))
     body = "\n".join(lines)
     if filename.endswith(".py"):
         return "# -*- coding: utf-8 -*-\n'''\n%s\n'''\n" % body

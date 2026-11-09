@@ -2,6 +2,7 @@
 '''
 new Env('东东农场转盘');
 16 9 * * * jd_nczp.py
+版本：20261109
 '''
 import os
 import sys

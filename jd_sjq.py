@@ -2,6 +2,7 @@
 '''
 new Env('手机圈');
 18 16 * * * jd_sjq.py
+版本：20261109
 '''
 import os
 import sys

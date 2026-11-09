@@ -2,6 +2,7 @@
 '''
 new Env('京东秒杀');
 8 9 * * * jd_jdms.py
+版本：20261109
 '''
 import os
 import sys

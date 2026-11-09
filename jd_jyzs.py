@@ -2,6 +2,7 @@
 '''
 new Env('交易指数');
 36 15 * * * jd_jyzs.py
+版本：20261109
 '''
 import os
 import sys

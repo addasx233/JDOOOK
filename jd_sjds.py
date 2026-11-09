@@ -2,6 +2,7 @@
 '''
 new Env('晒家大赛');
 8 10 * * * jd_sjds.py
+版本：20261109
 '''
 import os
 import sys
