@@ -7,6 +7,7 @@ import select
 import socket
 import sys
 import threading
+import time
 
 import requests
 
@@ -132,6 +133,7 @@ class ProxyPool:
             raise HotSkip(f"连续火爆 {HOT_LIMIT} 次，跳过当前账号")
         if self.enabled() and not self.bypass:
             self.refresh("活动火爆，更换代理")
+        time.sleep(5)
         return True
 
     def revive(self, exc: BaseException) -> bool:
