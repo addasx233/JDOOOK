@@ -40,14 +40,14 @@ JA4_MODULE = "ja4_client.py"
 def env_banner(text, filename):
     name = re.search(r"""new Env\(\s*['"](.+?)['"]\s*\)""", text)
     cron = re.search(r"(?m)^\s*(\d+\s+\d+\s+\*\s+\*\s+\*\s+\S+)", text)
-    version = re.search(r"版本：(\d{8})", text)
+    version = re.search(r"(?m)^\s*(版本：\d{8})\s*$", text)
     if not name:
         return ""
     lines = ["new Env('%s');" % name.group(1)]
     if cron:
         lines.append(cron.group(1))
     if version:
-        lines.append("版本：%s" % version.group(1))
+        lines.append(version.group(1))
     body = "\n".join(lines)
     if filename.endswith(".py"):
         return "# -*- coding: utf-8 -*-\n'''\n%s\n'''\n" % body
@@ -118,29 +118,34 @@ def js_loader(rel, banner):
     )
 
 
-def rebuild():
-    if os.path.isdir(PAYLOAD):
-        shutil.rmtree(PAYLOAD)
-    os.makedirs(UTILS, exist_ok=True)
-    scripts = []
+def script_names():
+    found = []
     for name in sorted(os.listdir(ROOT)):
         if name.startswith("jd_") and name.endswith((".py", ".js")):
-            scripts.append(name)
-    for name in scripts:
-        src = os.path.join(ROOT, name)
-        text = inline_author_invite(open(src, "r", encoding="utf-8").read())
-        write_payload(name, text.encode("utf-8"))
-        banner = env_banner(text, name)
-        loader = python_loader(name, banner) if name.endswith(".py") else js_loader(name, banner)
-        with open(os.path.join(HERE, name), "w", encoding="utf-8", newline="\n") as handle:
-            handle.write(loader)
-    for name in SHARED:
-        src = os.path.join(ROOT, name)
-        text = open(src, "r", encoding="utf-8").read()
-        write_payload(name, text.encode("utf-8"))
-        leftover = os.path.join(HERE, name)
-        if os.path.isfile(leftover):
-            os.remove(leftover)
+            found.append(name)
+    return found
+
+
+def write_script(name):
+    src = os.path.join(ROOT, name)
+    text = inline_author_invite(open(src, "r", encoding="utf-8").read())
+    write_payload(name, text.encode("utf-8"))
+    banner = env_banner(text, name)
+    loader = python_loader(name, banner) if name.endswith(".py") else js_loader(name, banner)
+    with open(os.path.join(HERE, name), "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(loader)
+
+
+def write_shared(name):
+    src = os.path.join(ROOT, name)
+    text = open(src, "r", encoding="utf-8").read()
+    write_payload(name, text.encode("utf-8"))
+    leftover = os.path.join(HERE, name)
+    if os.path.isfile(leftover):
+        os.remove(leftover)
+
+
+def write_ja4():
     ja4_src = os.path.join(ROOT, JA4_SOURCE)
     write_payload(JA4_MODULE, open(ja4_src, "r", encoding="utf-8").read().encode("utf-8"))
     for leftover in (
@@ -149,24 +154,161 @@ def rebuild():
     ):
         if os.path.isfile(leftover):
             os.remove(leftover)
+
+
+def write_own_util(name):
+    src = os.path.join(ROOT, "utils", name)
+    text = open(src, "r", encoding="utf-8").read()
+    rel = "utils/" + name
+    write_payload(rel, text.encode("utf-8"))
+    loader = python_loader(rel, "") if name.endswith(".py") else js_loader(rel, "")
+    # utils 里的 Python 启动器要能找到上一级的 _boot。
+    if name.endswith(".py"):
+        loader = (
+            "# -*- coding: utf-8 -*-\n"
+            "import os\n"
+            "import sys\n"
+            "sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n"
+            "from _boot import run\n"
+            "run(__file__)\n"
+        )
+    os.makedirs(UTILS, exist_ok=True)
+    with open(os.path.join(UTILS, name), "w", encoding="utf-8", newline="\n") as handle:
+        handle.write(loader)
+
+
+def remove_output(rel):
+    plain = os.path.join(HERE, rel.replace("/", os.sep))
+    blob = os.path.join(PAYLOAD, rel.replace("/", os.sep) + ".bin")
+    for path in (plain, blob):
+        if os.path.isfile(path):
+            os.remove(path)
+
+
+def local_changes():
+    """工作区相对 HEAD 的路径。第二项为 True 表示这个文件已删除。"""
+    def run(args):
+        proc = subprocess.run(args, cwd=ROOT, capture_output=True, check=False)
+        if proc.returncode != 0:
+            message = proc.stderr.decode("utf-8", "replace").strip() or "git 命令失败"
+            raise SystemExit(message)
+        return [line.strip().replace("\\", "/") for line in proc.stdout.decode("utf-8").splitlines() if line.strip()]
+
+    deleted = set(run(["git", "diff", "--name-only", "--diff-filter=D", "HEAD"]))
+    seen = []
+    known = set()
+    for rel in run(["git", "diff", "--name-only", "HEAD"]) + run(["git", "ls-files", "--others", "--exclude-standard"]):
+        if rel in known:
+            continue
+        known.add(rel)
+        seen.append((rel, rel in deleted))
+    return seen
+
+
+def scripts_using_author():
+    found = []
+    for name in script_names():
+        text = open(os.path.join(ROOT, name), "r", encoding="utf-8").read()
+        if "author_invite" in text:
+            found.append(name)
+    return found
+
+
+def update_changed():
+    """只重打工作区里改过的源文件。邀请码变了时，引用它的脚本一起重打。"""
+    os.makedirs(UTILS, exist_ok=True)
+    if not os.path.isdir(PAYLOAD):
+        os.makedirs(PAYLOAD)
+    updated = []
+    author_changed = False
+    for rel, deleted in local_changes():
+        name = os.path.basename(rel)
+        if rel.startswith("jd_") and rel.endswith((".py", ".js")) and "/" not in rel:
+            if deleted:
+                remove_output(rel)
+            else:
+                write_script(rel)
+            updated.append(rel)
+            continue
+        if rel == "author_invite.py":
+            author_changed = not deleted
+            continue
+        if rel in SHARED:
+            if deleted:
+                remove_output(rel)
+            else:
+                write_shared(rel)
+            updated.append(rel)
+            continue
+        if rel == "utils/ja4_client.py":
+            if deleted:
+                remove_output(JA4_MODULE)
+                remove_output(rel)
+            else:
+                write_ja4()
+                write_own_util(name)
+            updated.append(rel)
+            continue
+        if rel.startswith("utils/") and name in OWN_UTILS:
+            if deleted:
+                remove_output(rel)
+            else:
+                write_own_util(name)
+            updated.append(rel)
+            continue
+        if rel.startswith("utils/") and name in VENDOR:
+            dest = os.path.join(UTILS, name)
+            if deleted:
+                if os.path.isfile(dest):
+                    os.remove(dest)
+            else:
+                shutil.copy2(os.path.join(ROOT, rel), dest)
+            updated.append(rel)
+            continue
+        if rel == "proxy_pool.py":
+            dest = os.path.join(HERE, "proxy_pool.py")
+            if deleted:
+                if os.path.isfile(dest):
+                    os.remove(dest)
+            else:
+                shutil.copy2(os.path.join(ROOT, rel), dest)
+            updated.append(rel)
+            continue
+        if rel == "utils/proxy_pool.js":
+            dest = os.path.join(UTILS, "proxy_pool.js")
+            if deleted:
+                if os.path.isfile(dest):
+                    os.remove(dest)
+            else:
+                shutil.copy2(os.path.join(ROOT, rel), dest)
+            updated.append(rel)
+    if author_changed:
+        for name in scripts_using_author():
+            if name in updated:
+                continue
+            write_script(name)
+            updated.append(name)
+    if not updated:
+        print("没有需要更新的加密文件")
+        return
+    if not os.path.isfile(os.path.join(HERE, "_boot.js")):
+        write_js_boot()
+    check_roundtrip([item for item in updated if not item.startswith("proxy_pool")])
+    print("已更新 %d 个：%s" % (len(updated), "、".join(updated)))
+
+
+def rebuild():
+    if os.path.isdir(PAYLOAD):
+        shutil.rmtree(PAYLOAD)
+    os.makedirs(UTILS, exist_ok=True)
+    scripts = script_names()
+    for name in scripts:
+        write_script(name)
+    for name in SHARED:
+        write_shared(name)
+    write_ja4()
     for name in OWN_UTILS:
-        src = os.path.join(ROOT, "utils", name)
-        text = open(src, "r", encoding="utf-8").read()
-        rel = "utils/" + name
-        write_payload(rel, text.encode("utf-8"))
-        loader = python_loader(rel, "") if name.endswith(".py") else js_loader(rel, "")
-        # utils 里的 Python 启动器要能找到上一级的 _boot。
-        if name.endswith(".py"):
-            loader = (
-                "# -*- coding: utf-8 -*-\n"
-                "import os\n"
-                "import sys\n"
-                "sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n"
-                "from _boot import run\n"
-                "run(__file__)\n"
-            )
-        with open(os.path.join(UTILS, name), "w", encoding="utf-8", newline="\n") as handle:
-            handle.write(loader)
+        write_own_util(name)
     for name in VENDOR:
         shutil.copy2(os.path.join(ROOT, "utils", name), os.path.join(UTILS, name))
     leftover = os.path.join(HERE, "author_invite.py")
@@ -175,7 +317,7 @@ def rebuild():
     shutil.copy2(os.path.join(ROOT, "proxy_pool.py"), os.path.join(HERE, "proxy_pool.py"))
     shutil.copy2(os.path.join(ROOT, "utils", "proxy_pool.js"), os.path.join(UTILS, "proxy_pool.js"))
     write_js_boot()
-    check_roundtrip(scripts[0])
+    check_roundtrip(None)
     print("加密完成，入口 %d 个，目录 %s" % (len(scripts), HERE))
 
 
@@ -213,20 +355,32 @@ module.exports = { decrypt };
         handle.write(text)
 
 
-def check_roundtrip(_name):
+def payload_rels():
+    found = []
     for dirpath, _, names in os.walk(PAYLOAD):
         for name in names:
             if not name.endswith(".bin"):
                 continue
             blob_path = os.path.join(dirpath, name)
             rel = os.path.relpath(blob_path, PAYLOAD).replace("\\", "/")[: -len(".bin")]
-            plain = decrypt(KEY, open(blob_path, "rb").read()).decode("utf-8")
-            source_rel = JA4_SOURCE if rel == JA4_MODULE else rel.replace("/", os.sep)
-            original = inline_author_invite(
-                open(os.path.join(ROOT, source_rel), "r", encoding="utf-8").read()
-            )
-            if plain != original:
-                raise SystemExit("回读校验失败: " + rel)
+            found.append(rel)
+    return found
+
+
+def check_one(rel):
+    blob_path = os.path.join(PAYLOAD, rel.replace("/", os.sep) + ".bin")
+    if not os.path.isfile(blob_path):
+        return
+    plain = decrypt(KEY, open(blob_path, "rb").read()).decode("utf-8")
+    source_rel = JA4_SOURCE if rel == JA4_MODULE else rel.replace("/", os.sep)
+    original = inline_author_invite(
+        open(os.path.join(ROOT, source_rel), "r", encoding="utf-8").read()
+    )
+    if plain != original:
+        raise SystemExit("回读校验失败: " + rel)
+
+
+def check_node_sign():
     proc = subprocess.run(
         ["node", "-e", "const b=require('./_boot.js'); process.stdout.write(b.decrypt(require('path').join(__dirname,'utils','farm_edge_sign.js')))"],
         cwd=HERE,
@@ -241,5 +395,18 @@ def check_roundtrip(_name):
         raise SystemExit("node 解密结果和源码不一致")
 
 
+def check_roundtrip(rels):
+    chosen = payload_rels() if rels is None else rels
+    for rel in chosen:
+        if rel.startswith("proxy_pool") or rel.endswith(VENDOR):
+            continue
+        check_one(rel)
+    if rels is None or "utils/farm_edge_sign.js" in rels:
+        check_node_sign()
+
+
 if __name__ == "__main__":
-    rebuild()
+    if "--all" in sys.argv:
+        rebuild()
+    else:
+        update_changed()
