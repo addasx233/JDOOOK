@@ -4,7 +4,7 @@
 
 每个账号必须有自己的真实抓包，缺一项就打印缺什么并跳过。不能拿别的号或脚本里的值顶上。信息保存在 `cache/accounts/<pt_pin>.json`。
 
-iPhone 用 Stream 抓 `api.m.jd.com`，点右上角复制 cURL，整段贴进 `JD_COOKIE`。安卓自己抓同一条请求。
+优先用 iPhone 抓的 Cookie。用 Stream 抓 `api.m.jd.com`，点右上角复制 cURL，整段贴进 `JD_COOKIE`。安卓环境抓的没测过，可能会有问题。
 
 | 必填 | 抓包里的名字 | 要求 |
 | --- | --- | --- |
@@ -48,6 +48,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_sjg.py             | 手机馆      |
 | jd_sjq.py             | 手机圈      |
 | jd_ttgjd.py           | 天天挂京豆    |
+| jd_wmjq.py            | 外卖抢金券    |
 | jd_wyqdzx.py          | 网页签到中心   |
 | jd_yyy.py             | 摇一摇得京豆   |
 | jd_zhf.py             | 赚话费      |
