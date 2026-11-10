@@ -66,7 +66,9 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | --- | --- |
 | `JD_COOKIE` | 必填。写法见上面的「账号必填」。手机端脚本用，网页签到中心不读这个。 |
 | `WEBJD_COOKIE` | 只给网页签到中心用。www.jd.com 登录后的 Cookie，里面要有 `thor`。账号名用 `pin`，没有就用 `_pst`。多账号用 `&` 或换行。不认手机端 `pt_key`。 |
-| `FARM_ASSIST_PRIORITY` | 可选，只给东东农场用。优先被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。每个号最多助力 3 次，前 2 个号先助力作者，然后按这个名单，不够再随机帮其他号。 |
+| `FARM_ASSIST_TIMES` | 可选，只给东东农场用。每个账号成功助力的次数。不填则 35 次。作者、优先 pin 和指定助力码都算在这次数里。 |
+| `FARM_ASSIST_PRIORITY` | 可选，只给东东农场用。优先被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。每个号成功助力达到 `FARM_ASSIST_TIMES` 即停，前 2 个号先助力作者，然后按这个名单，再按 `FARM_ASSIST_CODE`，不够再随机帮其他号。 |
+| `FARM_ASSIST_CODE` | 可选，只给东东农场用。直接指定被助力的邀请码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `inviteCode` 的分享链接。排在优先 pin 之后、随机互助力之前。和自己缓存里的邀请码相同则跳过。 |
 | `FISH_ASSIST_PRIORITY` | 可选，只给捕鱼助力用。被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。第一个号先助力作者，其余号按这个名单助力。邀请码缓存在 `cache/fish_invite.json`。 |
 | `AUCTION_GUESS_RANDOM` | 可选，只给京豆拍卖用。设为 1 时，题目里没有正确答案就从选项里随便猜。不设就只在题目带了正确答案时才猜。 |
 | `FARM_BROWSER` | 可选。Chrome / Chromium / Edge 的可执行文件路径。不填就自动找。 |
