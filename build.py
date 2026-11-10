@@ -37,9 +37,18 @@ OWN_UTILS = (
 )
 # 活动脚本会 import 这些文件。打进密文，分享目录不留明文，由 _boot 按需解密。
 SHARED = ("account_common.py",)
-# 源码放在 utils，导入名仍是 ja4_client。
-JA4_SOURCE = os.path.join("utils", "ja4_client.py")
+# 源码放在 utils，按模块名导入：ja4_client 和各类任务模块。密文放在根目录同名位置，分享目录不留明文。
 JA4_MODULE = "ja4_client.py"
+
+
+def module_utils():
+    folder = os.path.join(ROOT, "utils")
+    names = [
+        name
+        for name in os.listdir(folder)
+        if name.endswith(".py") and name not in OWN_UTILS and os.path.isfile(os.path.join(folder, name))
+    ]
+    return [JA4_MODULE] + sorted(names)
 
 
 def env_banner(text, filename):
@@ -322,11 +331,12 @@ def rebuild():
         expected_payloads.add(name)
         drop(os.path.join(HERE, name), name, stats)
 
-    ja4_text = read_text(os.path.join(ROOT, JA4_SOURCE))
-    publish_payload(manifest, stats, JA4_MODULE, ja4_text.encode("utf-8"), None, None)
-    expected.add(JA4_MODULE)
-    expected_payloads.add(JA4_MODULE)
-    drop(os.path.join(HERE, JA4_MODULE), JA4_MODULE, stats)
+    for name in module_utils():
+        text = inline_author_invite(read_text(os.path.join(ROOT, "utils", name)))
+        publish_payload(manifest, stats, name, text.encode("utf-8"), None, None)
+        expected.add(name)
+        expected_payloads.add(name)
+        drop(os.path.join(HERE, name), name, stats)
 
     for name in OWN_UTILS:
         rel = "utils/" + name
@@ -422,7 +432,7 @@ def check_roundtrip(names, boot_changed):
     for rel in names:
         blob_path = payload_path(rel)
         plain = decrypt(KEY, read_bytes(blob_path)).decode("utf-8")
-        source_rel = JA4_SOURCE if rel == JA4_MODULE else rel.replace("/", os.sep)
+        source_rel = os.path.join("utils", rel) if rel in module_utils() else rel.replace("/", os.sep)
         original = inline_author_invite(read_text(os.path.join(ROOT, source_rel)))
         if plain != original:
             raise SystemExit("回读校验失败: " + rel)

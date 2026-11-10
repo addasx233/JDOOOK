@@ -2,7 +2,7 @@
 '''
 new Env('网页签到中心');
 20 9 * * * jd_wyqdzx.py
-版本：20261109
+版本：20261110
 '''
 import os
 import sys

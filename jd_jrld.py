@@ -2,7 +2,7 @@
 '''
 new Env('金融领豆');
 18 8 * * * jd_jrld.py
-版本：20261109
+版本：20261110
 '''
 import os
 import sys

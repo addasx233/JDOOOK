@@ -2,7 +2,7 @@
 '''
 new Env('手机馆');
 48 11 * * * jd_sjg.py
-版本：20261109
+版本：20261110
 '''
 import os
 import sys
