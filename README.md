@@ -108,5 +108,3 @@ python3 -m pip install --break-system-packages prettytable
 ```shell
 ql repo https://github.com/addasx233/JDOOOK.git "jd_" "_boot|_aes|_key|_payload|proxy_pool|utils" "_boot|_aes|_key|_payload|proxy_pool|utils" "main" "py|js|bin"
 ```
-
-这条会留下 `jd_` 入口，以及 `_boot.py`、`_boot.js`、`_aes.py`、`_key.py`、`proxy_pool.py`、`utils` 和 `_payload` 里的 `.bin`。邀请码已经写进密文，分享仓库里没有 `author_invite.py`。
