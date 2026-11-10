@@ -34,6 +34,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_byzl.py            | 捕鱼助力     |
 | jd_jdjx.py            | 京东惊喜     |
 | jd_jdms.py            | 京东秒杀     |
+| jd_jdpm.py            | 京豆拍卖     |
 | jd_jdtj.py            | 京东特价     |
 | jd_jrld.py            | 金融领豆     |
 | jd_jyzs.py            | 交易指数     |
@@ -62,6 +63,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | `WEBJD_COOKIE` | 只给网页签到中心用。www.jd.com 登录后的 Cookie，里面要有 `thor`。账号名用 `pin`，没有就用 `_pst`。多账号用 `&` 或换行。不认手机端 `pt_key`。 |
 | `FARM_ASSIST_PRIORITY` | 可选，只给东东农场用。优先被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。每个号最多助力 3 次，前 2 个号先助力作者，然后按这个名单，不够再随机帮其他号。 |
 | `FISH_ASSIST_PRIORITY` | 可选，只给捕鱼助力用。被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。第一个号先助力作者，其余号按这个名单助力。邀请码缓存在 `cache/fish_invite.json`。 |
+| `AUCTION_GUESS_RANDOM` | 可选，只给京豆拍卖用。设为 1 时，题目里没有正确答案就从选项里随便猜。不设就只在题目带了正确答案时才猜。 |
 | `FARM_BROWSER` | 可选。Chrome / Chromium / Edge 的可执行文件路径。不填就自动找。 |
 | `JD_PROXY_API` | 可选。代理提取接口的完整地址，返回一行 `ip:port`。每个账号开始时取一次。取失败只提示当前 IP 是不是不在白名单，然后不加代理直接运行。活动火爆或代理失效会重新取。连续火爆 3 次跳过当前账号。不填则直连。 |
 
