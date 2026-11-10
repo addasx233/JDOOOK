@@ -1,10 +1,14 @@
 # -*- coding: utf-8 -*-
-"""把仓库里的脚本打成 encrypted 目录中的加密副本。分享时只发这个目录。"""
+"""把仓库里的脚本打成 encrypted 目录中的加密副本。分享时只发这个目录。
 
+只重写源码有改动或新增的文件。密文带随机数，不能靠比较 .bin 判断改动，
+所以用 .manifest.json 记下明文摘要。没有记录时先解密已有密文核对，内容一样就不重写。
+"""
+
+import hashlib
 import json
 import os
 import re
-import shutil
 import subprocess
 import sys
 
@@ -17,6 +21,7 @@ from _key import KEY  # noqa: E402
 
 PAYLOAD = os.path.join(HERE, "_payload")
 UTILS = os.path.join(HERE, "utils")
+MANIFEST = os.path.join(HERE, ".manifest.json")
 # 脚本运行时要按文件去读，这些是京东公开的签名库，不是自己的业务代码。
 VENDOR = (
     "js_security_v3_0.1.8.js",
@@ -118,70 +123,272 @@ def js_loader(rel, banner):
     )
 
 
-def rebuild():
-    if os.path.isdir(PAYLOAD):
-        shutil.rmtree(PAYLOAD)
-    os.makedirs(UTILS, exist_ok=True)
+def digest_of(*parts):
+    hasher = hashlib.sha256()
+    for part in parts:
+        if isinstance(part, str):
+            part = part.encode("utf-8")
+        hasher.update(part)
+        hasher.update(b"\0")
+    return hasher.hexdigest()
+
+
+def load_manifest():
+    try:
+        with open(MANIFEST, "r", encoding="utf-8") as handle:
+            data = json.load(handle)
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def save_manifest(manifest):
+    with open(MANIFEST, "w", encoding="utf-8", newline="\n") as handle:
+        json.dump(manifest, handle, ensure_ascii=False, indent=2, sort_keys=True)
+        handle.write("\n")
+
+
+def read_text(path):
+    with open(path, "r", encoding="utf-8") as handle:
+        return handle.read()
+
+
+def read_bytes(path):
+    with open(path, "rb") as handle:
+        return handle.read()
+
+
+def payload_path(rel):
+    return os.path.join(PAYLOAD, rel + ".bin")
+
+
+def same_payload(rel, plain):
+    path = payload_path(rel)
+    if not os.path.isfile(path):
+        return False
+    try:
+        return decrypt(KEY, read_bytes(path)) == plain
+    except (OSError, ValueError):
+        return False
+
+
+def same_text(path, text):
+    if not os.path.isfile(path):
+        return False
+    try:
+        return read_text(path) == text
+    except OSError:
+        return False
+
+
+def same_bytes(path, data):
+    if not os.path.isfile(path):
+        return False
+    try:
+        return read_bytes(path) == data
+    except OSError:
+        return False
+
+
+def drop(path, label, stats):
+    if not os.path.isfile(path):
+        return
+    os.remove(path)
+    stats["delete"].append(label)
+    print("删除 " + label)
+
+
+def publish_payload(manifest, stats, key, plain, loader_path, loader_text):
+    digest = digest_of(plain, loader_text or "")
+    loader_ready = loader_path is None or os.path.isfile(loader_path)
+    if manifest.get(key) == digest and os.path.isfile(payload_path(key)) and loader_ready:
+        stats["skip"] += 1
+        return False
+    loader_same = loader_path is None or same_text(loader_path, loader_text)
+    if same_payload(key, plain) and loader_same:
+        manifest[key] = digest
+        stats["skip"] += 1
+        return False
+    write_payload(key, plain)
+    if loader_path is not None:
+        os.makedirs(os.path.dirname(loader_path), exist_ok=True)
+        with open(loader_path, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(loader_text)
+    manifest[key] = digest
+    stats["update"].append(key)
+    print("更新 " + key)
+    return True
+
+
+def publish_bytes(manifest, stats, key, data, dest):
+    digest = digest_of(data)
+    if manifest.get(key) == digest and os.path.isfile(dest):
+        stats["skip"] += 1
+        return False
+    if same_bytes(dest, data):
+        manifest[key] = digest
+        stats["skip"] += 1
+        return False
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
+    with open(dest, "wb") as handle:
+        handle.write(data)
+    manifest[key] = digest
+    stats["update"].append(key)
+    print("更新 " + key)
+    return True
+
+
+def script_loader(name, text):
+    banner = env_banner(text, name)
+    if name.endswith(".py"):
+        return python_loader(name, banner)
+    return js_loader(name, banner)
+
+
+def util_loader(name):
+    rel = "utils/" + name
+    if name.endswith(".py"):
+        return (
+            "# -*- coding: utf-8 -*-\n"
+            "import os\n"
+            "import sys\n"
+            "sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n"
+            "from _boot import run\n"
+            "run(__file__)\n"
+        )
+    return js_loader(rel, "")
+
+
+def list_scripts():
     scripts = []
     for name in sorted(os.listdir(ROOT)):
         if name.startswith("jd_") and name.endswith((".py", ".js")):
             scripts.append(name)
+    return scripts
+
+
+def prune(scripts, expected_payloads, manifest, stats):
+    script_names = set(scripts)
+    if os.path.isdir(PAYLOAD):
+        for dirpath, _, names in os.walk(PAYLOAD):
+            for name in names:
+                if not name.endswith(".bin"):
+                    continue
+                blob = os.path.join(dirpath, name)
+                rel = os.path.relpath(blob, PAYLOAD).replace("\\", "/")[: -len(".bin")]
+                if rel in expected_payloads:
+                    continue
+                os.remove(blob)
+                manifest.pop(rel, None)
+                loader = None
+                if rel.startswith("utils/"):
+                    candidate = os.path.join(HERE, rel.replace("/", os.sep))
+                    base = os.path.basename(candidate)
+                    if base not in VENDOR and base != "proxy_pool.js":
+                        loader = candidate
+                elif rel.startswith("jd_"):
+                    loader = os.path.join(HERE, rel)
+                if loader is not None and os.path.isfile(loader):
+                    os.remove(loader)
+                stats["delete"].append(rel)
+                print("删除 " + rel)
+    for name in os.listdir(HERE):
+        if name.startswith("jd_") and name.endswith((".py", ".js")) and name not in script_names:
+            drop(os.path.join(HERE, name), name, stats)
+
+
+def rebuild():
+    os.makedirs(PAYLOAD, exist_ok=True)
+    os.makedirs(UTILS, exist_ok=True)
+    manifest = load_manifest()
+    stats = {"update": [], "skip": 0, "delete": []}
+    expected = set()
+    expected_payloads = set()
+    scripts = list_scripts()
+
     for name in scripts:
-        src = os.path.join(ROOT, name)
-        text = inline_author_invite(open(src, "r", encoding="utf-8").read())
-        write_payload(name, text.encode("utf-8"))
-        banner = env_banner(text, name)
-        loader = python_loader(name, banner) if name.endswith(".py") else js_loader(name, banner)
-        with open(os.path.join(HERE, name), "w", encoding="utf-8", newline="\n") as handle:
-            handle.write(loader)
+        text = inline_author_invite(read_text(os.path.join(ROOT, name)))
+        plain = text.encode("utf-8")
+        publish_payload(
+            manifest, stats, name, plain, os.path.join(HERE, name), script_loader(name, text)
+        )
+        expected.add(name)
+        expected_payloads.add(name)
+
     for name in SHARED:
-        src = os.path.join(ROOT, name)
-        text = open(src, "r", encoding="utf-8").read()
-        write_payload(name, text.encode("utf-8"))
-        leftover = os.path.join(HERE, name)
-        if os.path.isfile(leftover):
-            os.remove(leftover)
-    ja4_src = os.path.join(ROOT, JA4_SOURCE)
-    write_payload(JA4_MODULE, open(ja4_src, "r", encoding="utf-8").read().encode("utf-8"))
-    for leftover in (
-        os.path.join(HERE, JA4_MODULE),
-        os.path.join(UTILS, "ja4_client.py"),
-    ):
-        if os.path.isfile(leftover):
-            os.remove(leftover)
+        text = read_text(os.path.join(ROOT, name))
+        publish_payload(manifest, stats, name, text.encode("utf-8"), None, None)
+        expected.add(name)
+        expected_payloads.add(name)
+        drop(os.path.join(HERE, name), name, stats)
+
+    ja4_text = read_text(os.path.join(ROOT, JA4_SOURCE))
+    publish_payload(manifest, stats, JA4_MODULE, ja4_text.encode("utf-8"), None, None)
+    expected.add(JA4_MODULE)
+    expected_payloads.add(JA4_MODULE)
+    drop(os.path.join(HERE, JA4_MODULE), JA4_MODULE, stats)
+
     for name in OWN_UTILS:
-        src = os.path.join(ROOT, "utils", name)
-        text = open(src, "r", encoding="utf-8").read()
         rel = "utils/" + name
-        write_payload(rel, text.encode("utf-8"))
-        loader = python_loader(rel, "") if name.endswith(".py") else js_loader(rel, "")
-        # utils 里的 Python 启动器要能找到上一级的 _boot。
-        if name.endswith(".py"):
-            loader = (
-                "# -*- coding: utf-8 -*-\n"
-                "import os\n"
-                "import sys\n"
-                "sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))\n"
-                "from _boot import run\n"
-                "run(__file__)\n"
-            )
-        with open(os.path.join(UTILS, name), "w", encoding="utf-8", newline="\n") as handle:
-            handle.write(loader)
+        text = read_text(os.path.join(ROOT, "utils", name))
+        publish_payload(
+            manifest,
+            stats,
+            rel,
+            text.encode("utf-8"),
+            os.path.join(UTILS, name),
+            util_loader(name),
+        )
+        expected.add(rel)
+        expected_payloads.add(rel)
+
     for name in VENDOR:
-        shutil.copy2(os.path.join(ROOT, "utils", name), os.path.join(UTILS, name))
-    leftover = os.path.join(HERE, "author_invite.py")
-    if os.path.isfile(leftover):
-        os.remove(leftover)
-    shutil.copy2(os.path.join(ROOT, "proxy_pool.py"), os.path.join(HERE, "proxy_pool.py"))
-    shutil.copy2(os.path.join(ROOT, "utils", "proxy_pool.js"), os.path.join(UTILS, "proxy_pool.js"))
-    write_js_boot()
-    check_roundtrip(scripts[0])
-    print("加密完成，入口 %d 个，目录 %s" % (len(scripts), HERE))
+        rel = "utils/" + name
+        dest = os.path.join(UTILS, name)
+        publish_bytes(manifest, stats, rel, read_bytes(os.path.join(ROOT, "utils", name)), dest)
+        expected.add(rel)
+
+    drop(os.path.join(HERE, "author_invite.py"), "author_invite.py", stats)
+    publish_bytes(
+        manifest,
+        stats,
+        "proxy_pool.py",
+        read_bytes(os.path.join(ROOT, "proxy_pool.py")),
+        os.path.join(HERE, "proxy_pool.py"),
+    )
+    expected.add("proxy_pool.py")
+    publish_bytes(
+        manifest,
+        stats,
+        "utils/proxy_pool.js",
+        read_bytes(os.path.join(ROOT, "utils", "proxy_pool.js")),
+        os.path.join(UTILS, "proxy_pool.js"),
+    )
+    expected.add("utils/proxy_pool.js")
+
+    boot = write_js_boot().encode("utf-8")
+    publish_bytes(manifest, stats, "_boot.js", boot, os.path.join(HERE, "_boot.js"))
+    expected.add("_boot.js")
+
+    prune(scripts, expected_payloads, manifest, stats)
+    for key in list(manifest):
+        if key not in expected:
+            del manifest[key]
+    save_manifest(manifest)
+
+    written = [name for name in stats["update"] if name in expected_payloads]
+    check_roundtrip(written, "_boot.js" in stats["update"])
+    removed = len(stats["delete"])
+    extra = ("，删除 %d 个" % removed) if removed else ""
+    print(
+        "加密完成，更新 %d 个，未改动 %d 个%s，目录 %s"
+        % (len(stats["update"]), stats["skip"], extra, HERE)
+    )
 
 
 def write_js_boot():
     hex_key = KEY.hex()
-    text = """const crypto = require("crypto");
+    return """const crypto = require("crypto");
 const fs = require("fs");
 const path = require("path");
 
@@ -209,24 +416,20 @@ function decrypt(file) {
 
 module.exports = { decrypt };
 """ % hex_key
-    with open(os.path.join(HERE, "_boot.js"), "w", encoding="utf-8", newline="\n") as handle:
-        handle.write(text)
 
 
-def check_roundtrip(_name):
-    for dirpath, _, names in os.walk(PAYLOAD):
-        for name in names:
-            if not name.endswith(".bin"):
-                continue
-            blob_path = os.path.join(dirpath, name)
-            rel = os.path.relpath(blob_path, PAYLOAD).replace("\\", "/")[: -len(".bin")]
-            plain = decrypt(KEY, open(blob_path, "rb").read()).decode("utf-8")
-            source_rel = JA4_SOURCE if rel == JA4_MODULE else rel.replace("/", os.sep)
-            original = inline_author_invite(
-                open(os.path.join(ROOT, source_rel), "r", encoding="utf-8").read()
-            )
-            if plain != original:
-                raise SystemExit("回读校验失败: " + rel)
+def check_roundtrip(names, boot_changed):
+    for rel in names:
+        blob_path = payload_path(rel)
+        plain = decrypt(KEY, read_bytes(blob_path)).decode("utf-8")
+        source_rel = JA4_SOURCE if rel == JA4_MODULE else rel.replace("/", os.sep)
+        original = inline_author_invite(read_text(os.path.join(ROOT, source_rel)))
+        if plain != original:
+            raise SystemExit("回读校验失败: " + rel)
+    if not names and not boot_changed:
+        return
+    if "utils/farm_edge_sign.js" not in names and not boot_changed:
+        return
     proc = subprocess.run(
         ["node", "-e", "const b=require('./_boot.js'); process.stdout.write(b.decrypt(require('path').join(__dirname,'utils','farm_edge_sign.js')))"],
         cwd=HERE,
@@ -236,7 +439,7 @@ def check_roundtrip(_name):
     if proc.returncode != 0:
         raise SystemExit(proc.stderr.decode("utf-8", "replace") or "node 解密失败")
     js_plain = proc.stdout.decode("utf-8")
-    js_orig = open(os.path.join(ROOT, "utils", "farm_edge_sign.js"), "r", encoding="utf-8").read()
+    js_orig = read_text(os.path.join(ROOT, "utils", "farm_edge_sign.js"))
     if js_plain != js_orig:
         raise SystemExit("node 解密结果和源码不一致")
 
