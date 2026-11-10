@@ -108,5 +108,5 @@ python3 -m pip install --break-system-packages prettytable
 拉库只给 `jd_` 开头的脚本加定时任务。黑名单里的文件不会加定时，依赖文件仍会拷下来。青龙先按最后一个参数里的后缀过滤，再按白名单和依赖决定留哪些文件。
 
 ```shell
-ql repo https://github.com/addasx233/JDOOOK.git "jd_" "_boot|_aes|_key|_payload|proxy_pool|utils" "_boot|_aes|_key|_payload|proxy_pool|utils" "main" "py|js|bin"
+ql repo https://github.com/addasx233/JDOOOK.git "jd_" "_payload|utils" "_payload|_boot|_aes|_key|author_invite|proxy_pool|utils" "main" "py|js|bin"
 ```
