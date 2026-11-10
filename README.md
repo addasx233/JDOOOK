@@ -36,6 +36,8 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_jdms.py            | 京东秒杀     |
 | jd_jdpm.py            | 京豆拍卖     |
 | jd_jdtj.py            | 京东特价     |
+| jd_jrby.py            | 京融捕鱼     |
+| jd_jrdl.py            | 金融集电量    |
 | jd_jrld.py            | 金融领豆     |
 | jd_jyzs.py            | 交易指数     |
 | jd_klhb.py            | 快乐红包     |
@@ -47,6 +49,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_rankVote.py        | 排行榜做任务   |
 | jd_sjds.py            | 晒家大赛     |
 | jd_sjg.py             | 手机馆      |
+| jd_sytj.py            | 收益统计     |
 | jd_sjq.py             | 手机圈      |
 | jd_ttgjd.py           | 天天挂京豆    |
 | jd_wmjq.py            | 外卖抢金券    |
@@ -54,6 +57,8 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_yyy.py             | 摇一摇得京豆   |
 | jd_zhf.py             | 赚话费      |
 | jd_zjd.py             | 9.9包邮砸金蛋 |
+
+各活动脚本跑完一个账号后，把这次领到的京豆和红包加进 `cache/earnings/<pt_pin>.json`。东东农场和东东农场转盘同时记领到的水滴。一个账号一个文件，同一天多次运行会累加，只保留最近三天。`jd_sytj.py` 按脚本打印这些记录，并删掉三天前的日期。
 
 ## 环境变量
 
@@ -70,6 +75,8 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 ## 环境依赖
 
 整套脚本一起装这些就够：Python 3、`requests`、`prettytable`、Node、Chromium、Xvfb、字体、OpenSSL。
+
+登录校验、Cookie 拆分和多账号重试在 `account_common.py`，它不是定时任务。加密后这份代码只在密文里，入口脚本由启动器加载。
 
 签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
 
