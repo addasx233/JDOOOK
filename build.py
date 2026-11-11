@@ -24,15 +24,12 @@ UTILS = os.path.join(HERE, "utils")
 MANIFEST = os.path.join(HERE, ".manifest.json")
 # 脚本运行时要按文件去读，这些是京东公开的签名库，不是自己的业务代码。
 VENDOR = (
-    "js_security_v3_0.1.8.js",
     "js_security_v3_lite_0.1.5.js",
     "js_security_v3_main_0.1.8.js",
 )
 OWN_UTILS = (
     "farm_edge_sign.js",
     "h5st_5_3.js",
-    "get_h5st.js",
-    "get_h5st.py",
     "ja4_client.py",
 )
 # 活动脚本会 import 这些文件。打进密文，分享目录不留明文，由 _boot 按需解密。
@@ -293,7 +290,7 @@ def prune(scripts, expected_payloads, manifest, stats):
                 if rel.startswith("utils/"):
                     candidate = os.path.join(HERE, rel.replace("/", os.sep))
                     base = os.path.basename(candidate)
-                    if base not in VENDOR and base != "proxy_pool.js":
+                    if base not in VENDOR:
                         loader = candidate
                 elif rel.startswith("jd_"):
                     loader = os.path.join(HERE, rel)
@@ -367,20 +364,16 @@ def rebuild():
         os.path.join(HERE, "proxy_pool.py"),
     )
     expected.add("proxy_pool.py")
-    publish_bytes(
-        manifest,
-        stats,
-        "utils/proxy_pool.js",
-        read_bytes(os.path.join(ROOT, "utils", "proxy_pool.js")),
-        os.path.join(UTILS, "proxy_pool.js"),
-    )
-    expected.add("utils/proxy_pool.js")
 
     boot = write_js_boot().encode("utf-8")
     publish_bytes(manifest, stats, "_boot.js", boot, os.path.join(HERE, "_boot.js"))
     expected.add("_boot.js")
 
     prune(scripts, expected_payloads, manifest, stats)
+    # 源码里已经删掉的明文副本（旧签名库等）不会走到上面的密文清理，这里单独删。
+    for name in sorted(os.listdir(UTILS)):
+        if "utils/" + name not in expected:
+            drop(os.path.join(UTILS, name), "utils/" + name, stats)
     for key in list(manifest):
         if key not in expected:
             del manifest[key]

@@ -9,14 +9,18 @@
 | 必填 | 抓包里的名字 | 要求 |
 | --- | --- | --- |
 | `pt_key`、`pt_pin` | Cookie | 登录态 |
-| `user_agent` | `User-Agent` | 以 `jdapp;` 开头，并且能看出系统版本 |
+| `user_agent` | `User-Agent` | 以 `jdapp;` 开头，并且能看出系统版本；`ep` 就在里面，整段别裁 |
 | `uuid` | `uuid` | 32 到 40 位十六进制 |
 | `eid_token` | `x-api-eid-token` | `jdd` 开头，长度 100–400 |
-| `wg_token` | `wg-sdk-token` | `jdd01` 开头，长度至少 100 |
 | `d_brand`、`d_model` | `d_brand`、`d_model` | 明文机型，密文丢掉 |
 | `os_version` | `osVersion` | 如 `18.5` |
-| `build` | `build` | 5 到 8 位数字，也可以从 UA 的 `appBuild` 取 |
-| `client_version` | `clientVersion` | App 版本，也可以从 `jdapp` UA 取 |
+| `build` | `build` | 5 到 8 位数字；没抓到时自动从 UA 的 `appBuild` 取 |
+| `client_version` | `clientVersion` | App 版本；没抓到时自动从 `jdapp` UA 取 |
+
+**按脚本才需要**：`wg_token`（抓包名 `wg-sdk-token`，`jdd01` 开头、长度至少 100）。
+只有 `task_wegame`（weGame）、`jd_ttgjd`（天天刮京豆）、`task_ap`（ap 活动）、
+`jd_yyy`（摇一摇）、`task_finance` / `task_fish`（金融、捕鱼）这几条线会发这个字段。
+没有它的账号照样能跑其它脚本，跑到这几条线时会打印「缺少 wg-sdk-token」并跳过该账号。
 
 `screen`、`openudid` 可以不写。没有 `openudid` 时用 `uuid`。`h5st` 每次请求现签，不写进缓存。
 
@@ -124,7 +128,7 @@ apk add --no-cache python3 py3-requests nodejs chromium xvfb ttf-freefont font-n
 python3 -m pip install --break-system-packages prettytable
 ```
 
-`apk` 会装上 Python、Node、Chromium、Xvfb、字体、OpenSSL 和 `requests`。`libssl3` 提供登录校验要用的 `libcrypto` 和 `libssl`。`prettytable` 给豆子统计用，要在仓库目录里装。旧版 pip 不认识 `--break-system-packages` 时，去掉这个参数再装一次。
+`apk` 会装上 Python、Node、Chromium、Xvfb、字体、OpenSSL 和 `requests`。`libssl3` 提供登录校验要用的 `libcrypto` 和 `libssl`。`prettytable` 给豆子统计用，要在仓库目录里装。旧版 pip 不认识 `--break-system-packages` 时，去掉这个参数再装一次。也可以改成执行 `sh 安装依赖.sh`。
 
 | 包 | 作用 |
 | --- | --- |
