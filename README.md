@@ -22,6 +22,8 @@
 `jd_yyy`（摇一摇）、`task_finance` / `task_fish`（金融、捕鱼）这几条线会发这个字段。
 没有它的账号照样能跑其它脚本，跑到这几条线时会打印「缺少 wg-sdk-token」并跳过该账号。
 
+**守护豆田还要定位**：`area`、`longitude`、`latitude`。解析 curl 或 HAR 时写入账号缓存。请求表单里有 `area`、`lng`、`lat` 就用这三项。没有时从 Referer 的 `tttparams` 取：那段是带前缀的 base64 JSON，`gps_area`（没有就用 `un_area`、`lbsArea`）写入 `area`，`lng`、`lat` 写入经纬度。`posLng`、`gLng` 是收货地址，不取。缺任何一个，守护豆田打印并跳过该账号，其它脚本不读这三项。分号拼接时也可以直接写 `area`、`lng`、`lat`（或 `longitude`、`latitude`），或者写 `tttparams`。同一段里有 `tttparams` 时用它解出的实时定位。`posLng`、`homeLng` 是收货地址，不取。这段只有定位、没有其它设备字段时，仍用该账号已有的缓存，只补上定位。
+
 `screen`、`openudid` 可以不写。没有 `openudid` 时用 `uuid`。`h5st` 每次请求现签，不写进缓存。
 
 系统版本只认这些：iOS 13、14–15、16–17、18–19、26–27，Android 10–16。iOS 27 先用 iOS 26 的 ClientHello。
@@ -44,6 +46,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_jrby.py            | 京融捕鱼     |
 | jd_jrdl.py            | 金融集电量    |
 | jd_jrld.py            | 金融领豆     |
+| jd_jrzd.py            | 金融赚京豆    |
 | jd_jyzs.py            | 交易指数     |
 | jd_kbmy.py            | 看病买药     |
 | jd_klhb.py            | 快乐红包     |
@@ -58,14 +61,16 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_sjg.py             | 手机馆      |
 | jd_sytj.py            | 收益统计     |
 | jd_sjq.py             | 手机圈      |
+| jd_shdt.py            | 守护豆田     |
 | jd_ttgjd.py           | 天天挂京豆    |
 | jd_wmjq.py            | 外卖抢金券    |
 | jd_wyqdzx.py          | 网页签到中心   |
 | jd_yyy.py             | 摇一摇得京豆   |
+| jd_zddd.py            | 种豆得豆     |
 | jd_zhf.py             | 赚话费      |
 | jd_zjd.py             | 9.9包邮砸金蛋 |
 
-各活动脚本跑完一个账号后，把这次领到的京豆和红包加进 `cache/earnings/<pt_pin>.json`。东东农场和东东农场转盘同时记领到的水滴。一个账号一个文件，同一天多次运行会累加，只保留最近三天。`jd_sytj.py` 按脚本打印这些记录，并删掉三天前的日期。
+各活动脚本跑完一个账号后，把这次领到的京豆和红包加进 `cache/earnings/<pt_pin>.json`。东东农场和东东农场转盘同时记领到的水滴。种豆得豆和守护豆田同时记收进成长值的收获值，统计里显示为 `🟢xN`。一个账号一个文件，同一天多次运行会累加，只保留最近三天。`jd_sytj.py` 按脚本打印这些记录，并删掉三天前的日期。
 
 ## 任务分类
 
@@ -78,15 +83,16 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | `task_jxzy.py` | 京喜频道：签到，浏览会场后领豆 | 京东惊喜、交易指数、手机馆 |
 | `task_interact.py` | 互动任务：多会场浏览、单会场倒计时浏览、领取和完成 | 领券中心、9.9包邮砸金蛋、外卖抢金券、京豆拍卖、京东特价 |
 | `task_babel.py` | 通天塔：倒计时浏览（时长不足再补一次）、加购、品牌会员、权益中心、圈子签到 | 天天挂京豆、手机圈、晒家大赛、圈子签到 |
-| `task_ap.py` | 限时浏览：开始计时、等待、完成、领奖 | 东东农场、东东农场转盘 |
+| `task_ap.py` | 限时浏览：开始计时、等待、完成、领奖 | 东东农场、东东农场转盘，种豆得豆和守护豆田经 `task_plant.py` 使用 |
+| `task_plant.py` | 种豆得豆页面：首页、气泡、收取收获值，页面上的 ap 接口 | 种豆得豆、守护豆田 |
 | `task_farm.py` | 邀请码缓存、助力顺序 | 东东农场、捕鱼助力 |
-| `task_finance.py` | 京东金融：网关签名请求、阅读任务 | 金融集电量、金融领豆，捕鱼经 `task_fish.py` 使用 |
+| `task_finance.py` | 京东金融：网关签名请求、阅读任务 | 金融集电量、金融领豆、金融赚京豆，捕鱼经 `task_fish.py` 使用 |
 | `task_fish.py` | 金融捕鱼游戏：打鱼、补能量、道具、邀请码和助力 | 京融捕鱼、捕鱼助力 |
 | `task_browse.py` | 浏览计时：读浏览秒数、开始、等待、领奖 | 快乐红包、赚话费、排行榜做任务、网页签到中心、摇一摇得京豆 |
 | `task_sign.py` | 京豆频道签到 | 京东秒杀 |
 | `task_comp_click.py` | 频道楼层点商品，进度满后领豆 | 零散小豆 |
 | `task_plus.py` | PLUS 盲盒、京豆商城刮卡 | 零散小豆 |
-| `task_wegame.py` | 游戏页签到抽奖 | 零散小豆 |
+| `task_wegame.py` | 游戏页签到抽奖 | 零散小豆、种豆得豆 |
 
 权益中心领豆、豆子7天统计、收益统计是单独的流程，只用上面的基础模块或不用。
 
