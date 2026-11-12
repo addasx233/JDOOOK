@@ -2,7 +2,7 @@
 '''
 new Env('京东服务');
 22 8 * * * jd_jdfw.py
-版本：20261110
+版本：20261112
 '''
 import os
 import sys
