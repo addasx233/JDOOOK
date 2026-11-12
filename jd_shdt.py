@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('守护豆田');
+12 8,11,14,17,20 * * * jd_shdt.py
 版本：20261112
 '''
 import os

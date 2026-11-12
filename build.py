@@ -50,7 +50,8 @@ def module_utils():
 
 def env_banner(text, filename):
     name = re.search(r"""new Env\(\s*['"](.+?)['"]\s*\)""", text)
-    cron = re.search(r"(?m)^\s*(\d+\s+\d+\s+\*\s+\*\s+\*\s+\S+)", text)
+    # 分和时可以是 8,11,14 这种列表。旧写法只认单个数字，守护豆田的定时会被丢掉。
+    cron = re.search(r"(?m)^\s*([\d*/,.-]+\s+[\d*/,.-]+\s+\*\s+\*\s+\*\s+\S+)", text)
     version = re.search(r"版本：(\d{8})", text)
     if not name:
         return ""
