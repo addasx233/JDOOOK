@@ -2,7 +2,7 @@
 '''
 new Env('种豆得豆');
 26 8 * * * jd_zddd.py
-版本：20261112
+版本：20261113
 '''
 import os
 import sys
