@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 """星空这类代理 API。环境变量 JD_PROXY_API 填完整取代理地址，不填则直连。"""
 
+import json
 import os
 import re
 import select
@@ -101,7 +102,7 @@ class ProxyPool:
 
         return self.attempt(once)
 
-    def attempt(self, func):
+    def attempt(self, func, *, watch_hot: bool = True):
         last = None
         for _ in range(6):
             try:
@@ -114,7 +115,7 @@ class ProxyPool:
                     continue
                 raise
             text = _response_text(result)
-            if text is not None and self.watch(text):
+            if text is not None and watch_hot and self.watch(text):
                 continue
             return result
         if isinstance(last, Exception):
@@ -128,7 +129,8 @@ class ProxyPool:
                 self.hot = 0
             return False
         self.hot += 1
-        print(f"活动火爆（连续 {self.hot}/{HOT_LIMIT}）")
+        note = _hot_note(text)
+        print(f"活动火爆（连续 {self.hot}/{HOT_LIMIT}）{note}")
         if self.hot >= HOT_LIMIT:
             raise HotSkip(f"连续火爆 {HOT_LIMIT} 次，跳过当前账号")
         if self.enabled() and not self.bypass:
@@ -247,6 +249,31 @@ class ProxyPool:
                     sock.close()
                 except OSError:
                     pass
+
+
+def _hot_note(text: str) -> str:
+    """火爆时带上接口自己的 code 和提示，方便区分网关 405 和活动里的业务码。"""
+    raw = text or ""
+    try:
+        data = json.loads(raw)
+    except ValueError:
+        data = None
+    if isinstance(data, dict):
+        inner = data.get("data") if isinstance(data.get("data"), dict) else {}
+        parts = []
+        if data.get("code") is not None:
+            parts.append(f"code={data.get('code')}")
+        if inner.get("bizCode") is not None:
+            parts.append(f"bizCode={inner.get('bizCode')}")
+        msg = inner.get("bizMsg") or data.get("msg") or data.get("echo") or ""
+        msg = str(msg).replace("\n", " ").strip()
+        if msg:
+            parts.append(msg[:80])
+        if parts:
+            return "：" + " ".join(parts)
+    start = raw.find("火爆")
+    snippet = raw[max(0, start - 24): start + 36].replace("\n", " ").strip()
+    return f"：{snippet}" if snippet else ""
 
 
 def _response_text(result):

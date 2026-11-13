@@ -22,7 +22,7 @@
 `jd_yyy`（摇一摇）、`task_finance` / `task_fish`（金融、捕鱼）这几条线会发这个字段。
 没有它的账号照样能跑其它脚本，跑到这几条线时会打印「缺少 wg-sdk-token」并跳过该账号。
 
-**守护豆田还要定位**：`area`、`longitude`、`latitude`。解析 curl 或 HAR 时写入账号缓存。请求表单里有 `area`、`lng`、`lat` 就用这三项。没有时从 Referer 的 `tttparams` 取：那段是带前缀的 base64 JSON，`gps_area`（没有就用 `un_area`、`lbsArea`）写入 `area`，`lng`、`lat` 写入经纬度。`posLng`、`gLng` 是收货地址，不取。缺任何一个，守护豆田打印并跳过该账号，其它脚本不读这三项。分号拼接时也可以直接写 `area`、`lng`、`lat`（或 `longitude`、`latitude`），或者写 `tttparams`。同一段里有 `tttparams` 时用它解出的实时定位。`posLng`、`homeLng` 是收货地址，不取。这段只有定位、没有其它设备字段时，仍用该账号已有的缓存，只补上定位。
+**守护豆田还要定位**：`area`、`longitude`、`latitude`。解析 curl 或 HAR 时写入账号缓存。请求表单里有 `area`、`lng`、`lat` 就用这三项。没有时从 Referer，或请求体 `fullUrl` 里的 `tttparams` 取：那段是带前缀的 base64 JSON，结尾被干扰码弄坏时丢掉最后一个字段再解。`gps_area`（没有就用 `un_area`、`lbsArea`）写入 `area`，`lng`、`lat` 写入经纬度。`posLng`、`gLng` 是收货地址，不取。缺任何一个，守护豆田打印并跳过该账号，其它脚本不读这三项。分号拼接时也可以直接写 `area`、`lng`、`lat`（或 `longitude`、`latitude`），或者写 `tttparams`。同一段里有 `tttparams` 时用它解出的实时定位。`posLng`、`homeLng` 是收货地址，不取。这段只有定位、没有其它设备字段时，仍用该账号已有的缓存，只补上定位。
 
 `screen`、`openudid` 可以不写。没有 `openudid` 时用 `uuid`。`h5st` 每次请求现签，不写进缓存。
 
