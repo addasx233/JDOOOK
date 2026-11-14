@@ -2,7 +2,7 @@
 '''
 new Env('权益中心领豆');
 46 14 * * * jd_qyzxld.py
-版本：20261110
+版本：20261114
 '''
 import os
 import sys
