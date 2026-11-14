@@ -2,7 +2,7 @@
 '''
 new Env('东东农场');
 41 7 * * * jd_mobileFarm.py
-版本：20261113
+版本：20261114
 '''
 import os
 import sys
