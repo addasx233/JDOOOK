@@ -49,7 +49,6 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_jrzd.py            | 金融赚京豆    |
 | jd_jyzs.py            | 交易指数     |
 | jd_kbmy.py            | 看病买药     |
-| jd_klhb.py            | 快乐红包     |
 | jd_lqzx.py            | 领券中心     |
 | jd_lsxd.py            | 零散小豆     |
 | jd_mobileFarm.py      | 东东农场     |
@@ -57,7 +56,6 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_qyzxld.py          | 权益中心领豆   |
 | jd_qzqd.py            | 圈子签到     |
 | jd_rankVote.py        | 排行榜做任务   |
-| jd_sjds.py            | 晒家大赛     |
 | jd_sjg.py             | 手机馆      |
 | jd_sytj.py            | 收益统计     |
 | jd_sjq.py             | 手机圈      |
@@ -69,6 +67,13 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_zddd.py            | 种豆得豆     |
 | jd_zhf.py             | 赚话费      |
 | jd_zjd.py             | 9.9包邮砸金蛋 |
+
+## outdate
+
+| 脚本 | 活动 |
+| --- | --- |
+| outdate/jd_klhb.py | 快乐红包 |
+| outdate/jd_sjds.py | 晒家大赛 |
 
 各活动脚本跑完一个账号后，把这次领到的京豆和红包加进 `cache/earnings/<pt_pin>.json`。东东农场和东东农场转盘同时记领到的水滴。种豆得豆和守护豆田同时记收进成长值的收获值，统计里显示为 `🟢xN`。一个账号一个文件，同一天多次运行会累加，只保留最近三天。`jd_sytj.py` 按脚本打印这些记录，并删掉三天前的日期。
 
@@ -141,5 +146,5 @@ python3 -m pip install --break-system-packages prettytable
 拉库只给 `jd_` 开头的脚本加定时任务。黑名单里的文件不会加定时，依赖文件仍会拷下来。青龙先按最后一个参数里的后缀过滤，再按白名单和依赖决定留哪些文件。
 
 ```shell
-ql repo https://github.com/addasx233/JDOOOK.git "jd_" "_payload|utils" "_payload|_boot|_aes|_key|author_invite|proxy_pool|utils" "main" "py|js|bin"
+ql repo https://github.com/addasx233/JDOOOK.git "jd_" "_payload|utils|outdate" "_payload|_boot|_aes|_key|author_invite|proxy_pool|utils|outdate" "main" "py|js|bin"
 ```
