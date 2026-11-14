@@ -143,8 +143,8 @@ python3 -m pip install --break-system-packages prettytable
 | `ttf-freefont`、`font-noto` | 字体 |
 | `libssl3` | OpenSSL，登录校验用 |
 
-拉库只给 `jd_` 开头的脚本加定时任务。黑名单里的文件不会加定时，依赖文件仍会拷下来。青龙先按最后一个参数里的后缀过滤，再按白名单和依赖决定留哪些文件。
+拉库只给仓库根目录下 `jd_` 开头的 `.py` 加定时任务。依赖写在第 4 个参数，会拉下来，但不加定时。黑名单里的普通文字会把匹配的路径排除，文件不再落盘。`utils` 和 `_payload` 写进黑名单后，这两个目录里的文件和 bin 都不会落盘。`outdate` 放黑名单，旧脚本不拉。
 
 ```shell
-ql repo https://github.com/addasx233/JDOOOK.git "jd_" "_payload|utils|outdate" "_payload|_boot|_aes|_key|author_invite|proxy_pool|utils|outdate" "main" "py|js|bin"
+ql repo https://github.com/addasx233/JDOOOK.git "^jd_[^/]+\.py$" "outdate" "_payload|_boot|_aes|_key|proxy_pool|utils" "main" "py|js|bin"
 ```
