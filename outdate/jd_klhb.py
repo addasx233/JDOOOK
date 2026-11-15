@@ -2,7 +2,7 @@
 '''
 new Env('快乐红包');
 27 12 * * * jd_klhb.py
-版本：20261112
+版本：20261115
 '''
 import os
 import sys
