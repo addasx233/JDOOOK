@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('京东特价');
-27 11 * * * jd_jdtj.py
-版本：20261110
+42 6 * * * jd_jdtj.py
+版本：20261115
 '''
 import os
 import sys

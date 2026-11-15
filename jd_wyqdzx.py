@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('网页签到中心');
-20 9 * * * jd_wyqdzx.py
+28 20 * * * jd_wyqdzx.py
 版本：20261115
 '''
 import os

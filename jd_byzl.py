@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('捕鱼助力');
-20 10 * * * jd_byzl.py
+4 1 * * * jd_byzl.py
 版本：20261115
 '''
 import os

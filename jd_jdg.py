@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('JDG抽奖');
-27 0 * * * jd_jdg.py
+53 3 * * * jd_jdg.py
 版本：20261115
 '''
 import os

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('零散小豆');
-18 11 * * * jd_lsxd.py
+4 13 * * * jd_lsxd.py
 版本：20261115
 '''
 import os

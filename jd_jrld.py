@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('金融领豆');
-18 8 * * * jd_jrld.py
-版本：20261112
+32 9 * * * jd_jrld.py
+版本：20261115
 '''
 import os
 import sys

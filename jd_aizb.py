@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('AI装备');
-41 7 * * * jd_aizb.py
+21 0 * * * jd_aizb.py
 版本：20261115
 '''
 import os

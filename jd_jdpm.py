@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('京豆拍卖');
-18 10 * * * jd_jdpm.py
-版本：20261110
+0 6 * * * jd_jdpm.py
+版本：20261115
 '''
 import os
 import sys

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('京融捕鱼');
-8 10 * * * jd_jrby.py
-版本：20261113
+48 7 * * * jd_jrby.py
+版本：20261115
 '''
 import os
 import sys

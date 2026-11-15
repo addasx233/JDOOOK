@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('天天挂京豆');
-53 8 * * * jd_ttgjd.py
+42 5 * * * jd_ttgjd.py
 版本：20261115
 '''
 import os

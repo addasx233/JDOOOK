@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('京东服务');
-22 8 * * * jd_jdfw.py
+11 3 * * * jd_jdfw.py
 版本：20261115
 '''
 import os

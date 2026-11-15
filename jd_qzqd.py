@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('圈子签到');
-0 13 * * * jd_qzqd.py
+53 15 * * * jd_qzqd.py
 版本：20261115
 '''
 import os

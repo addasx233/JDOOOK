@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('交易指数');
-36 15 * * * jd_jyzs.py
-版本：20261110
+56 10 * * * jd_jyzs.py
+版本：20261115
 '''
 import os
 import sys

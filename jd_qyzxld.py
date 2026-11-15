@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('权益中心领豆');
-46 14 * * * jd_qyzxld.py
+11 15 * * * jd_qyzxld.py
 版本：20261115
 '''
 import os

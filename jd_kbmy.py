@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('看病买药');
-26 9 * * * jd_kbmy.py
-版本：20261110
+39 11 * * * jd_kbmy.py
+版本：20261115
 '''
 import os
 import sys

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('赚话费');
-16 10 * * * jd_zhf.py
+12 6 * * * jd_zhf.py
 版本：20261115
 '''
 import os

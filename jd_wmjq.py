@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('外卖抢金券');
-10 9 * * * jd_wmjq.py
-版本：20261110
+25 19 * * * jd_wmjq.py
+版本：20261115
 '''
 import os
 import sys

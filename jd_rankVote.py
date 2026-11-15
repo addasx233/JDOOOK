@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('排行榜做任务');
-34 13 * * * jd_rankVote.py
+35 16 * * * jd_rankVote.py
 版本：20261115
 '''
 import os

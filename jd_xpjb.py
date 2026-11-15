@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('新品金榜');
-46 8 * * * jd_xpjb.py
+49 0 * * * jd_xpjb.py
 版本：20261115
 '''
 import os

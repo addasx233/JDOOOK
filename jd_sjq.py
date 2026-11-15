@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('手机圈');
-18 16 * * * jd_sjq.py
+0 18 * * * jd_sjq.py
 版本：20261115
 '''
 import os

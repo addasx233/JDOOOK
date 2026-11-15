@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('手机馆');
-48 11 * * * jd_sjg.py
-版本：20261110
+32 17 * * * jd_sjg.py
+版本：20261115
 '''
 import os
 import sys

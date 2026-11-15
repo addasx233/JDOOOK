@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('领券中心');
-28 11 * * * jd_lqzx.py
-版本：20261110
+21 12 * * * jd_lqzx.py
+版本：20261115
 '''
 import os
 import sys

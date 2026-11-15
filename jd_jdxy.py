@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('京东校园');
-12 9 * * * jd_jdxy.py
+25 7 * * * jd_jdxy.py
 版本：20261115
 '''
 import os

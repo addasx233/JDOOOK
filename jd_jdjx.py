@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('京东惊喜');
-18 16 * * * jd_jdjx.py
-版本：20261110
+35 4 * * * jd_jdjx.py
+版本：20261115
 '''
 import os
 import sys

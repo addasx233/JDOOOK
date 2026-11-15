@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('互动游戏');
-33 8 * * * jd_hdyx.py
+28 2 * * * jd_hdyx.py
 版本：20261115
 '''
 import os

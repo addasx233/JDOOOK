@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('抽奖赢好礼');
-18 0 * * * jd_cjyhl.py
+46 1 * * * jd_cjyhl.py
 版本：20261115
 '''
 import os
