@@ -2,7 +2,7 @@
 '''
 new Env('京东校园');
 25 7 * * * jd_jdxy.py
-版本：20261115
+版本：20261116
 '''
 import os
 import sys
