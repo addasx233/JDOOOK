@@ -2,7 +2,7 @@
 '''
 new Env('天天挂京豆');
 42 5 * * * jd_ttgjd.py
-版本：20261115
+版本：20261116
 '''
 import os
 import sys
