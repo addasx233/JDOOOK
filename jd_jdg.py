@@ -2,7 +2,7 @@
 '''
 new Env('JDG抽奖');
 53 3 * * * jd_jdg.py
-版本：20261115
+版本：20261116
 '''
 import os
 import sys
