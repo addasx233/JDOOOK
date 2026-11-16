@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
 new Env('种豆得豆');
-48 6 * * * jd_zddd.py
-版本：20261115
+48 6,10 * * * jd_zddd.py
+版本：20261116
 '''
 import os
 import sys
