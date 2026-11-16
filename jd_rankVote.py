@@ -2,7 +2,7 @@
 '''
 new Env('排行榜做任务');
 35 16 * * * jd_rankVote.py
-版本：20261115
+版本：20261116
 '''
 import os
 import sys
