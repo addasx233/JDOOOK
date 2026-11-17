@@ -2,7 +2,7 @@
 '''
 new Env('捕鱼助力');
 4 1 * * * jd_byzl.py
-版本：20261115
+版本：20261117
 '''
 import os
 import sys

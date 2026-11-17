@@ -89,20 +89,21 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | --- | --- |
 | `JD_COOKIE` | 必填。写法见上面的「账号必填」。手机端脚本用，网页签到中心不读这个。 |
 | `WEBJD_COOKIE` | 只给网页签到中心用。www.jd.com 登录后的 Cookie，里面要有 `thor`。账号名用 `pin`，没有就用 `_pst`。多账号用 `&` 或换行。不认手机端 `pt_key`。 |
+| `JD_ASSIST_PIN` | 可选，所有有助力 pin 的脚本共用。被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。某个脚本没填自己的 `*_ASSIST_PRIORITY` 时用这个名单。填了自己的优先 pin 就只用自己的。 |
 | `FARM_ASSIST_TIMES` | 可选，只给东东农场用。每个号最多被助力的次数。不填则 35 次。农场每个账号只能助力一次。作者、优先 pin 和指定助力码被助力到这个数后，后面的账号改帮下一个。 |
-| `FARM_ASSIST_PRIORITY` | 可选，只给东东农场用。优先被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。这些号先跑，做任务时把助力码写入 `cache/farm_invite.json`，已有的不覆盖。不在开头集中获取。每个号助力成功一次即停，原来顺序里的前 2 个号先助力作者，然后按这个名单，再按 `FARM_ASSIST_CODE`，它们都被助力满 `FARM_ASSIST_TIMES` 次后再随机帮其他号。 |
+| `FARM_ASSIST_PRIORITY` | 可选，只给东东农场用。优先被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。不填则用 `JD_ASSIST_PIN`。这些号先跑，做任务时把助力码写入 `cache/farm_invite.json`，已有的不覆盖。不在开头集中获取。每个号助力成功一次即停，原来顺序里的前 2 个号先助力作者，然后按这个名单，再按 `FARM_ASSIST_CODE`，它们都被助力满 `FARM_ASSIST_TIMES` 次后再随机帮其他号。 |
 | `FARM_ASSIST_CODE` | 可选，只给东东农场用。直接指定被助力的邀请码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `inviteCode` 的分享链接。排在优先 pin 之后、随机互助力之前。和自己缓存里的邀请码相同则跳过。 |
 | `FARM_WATER_SECONDS` | 可选，只给东东农场用。成功浇水之间的间隔秒数。不填则 3 秒。 |
-| `FISH_ASSIST_PRIORITY` | 可选，只给捕鱼助力用。被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。第一个号先助力作者，其余号按这个名单助力。邀请码缓存在 `cache/fish_invite.json`，取到时打印出来。 |
+| `FISH_ASSIST_PRIORITY` | 可选，只给捕鱼助力用。被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。不填则用 `JD_ASSIST_PIN`。第一个号先助力作者，其余号按这个名单助力。邀请码缓存在 `cache/fish_invite.json`，取到时打印出来。 |
 | `FISH_ASSIST_CODE` | 可选，只给捕鱼助力用。直接指定被助力的邀请码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `inviteCode` 的分享链接。排在优先 pin 之后。和自己缓存里的邀请码相同则跳过。 |
 | `FISH_ASSIST_TIMES` | 可选，只给捕鱼助力用。每个邀请码最多被助力成功的次数。不填则 10 次。作者、优先 pin 和指定邀请码被助力到这个数后，后面的账号不再助力它。 |
-| `JDG_ASSIST_PRIORITY` | 可选，只给 JDG抽奖用。指定被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。第一个号先助力作者，后面的号先助力第一个号，再按这个名单。邀请码缓存在 `cache/jdg_invite.json`，已有的不覆盖。 |
+| `JDG_ASSIST_PRIORITY` | 可选，只给 JDG抽奖用。指定被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。不填则用 `JD_ASSIST_PIN`。第一个号先助力作者，后面的号先助力第一个号，再按这个名单。邀请码缓存在 `cache/jdg_invite.json`，已有的不覆盖。 |
 | `JDG_ASSIST_CODE` | 可选，只给 JDG抽奖用。直接指定被助力的助力码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `inviterId` 的分享链接。排在优先 pin 之后。和自己缓存里的助力码相同则跳过。 |
 | `JDG_ASSIST_TIMES` | 可选，只给 JDG抽奖用。每个助力码最多被助力成功的次数。不填则 10 次。作者、第一个号、优先 pin 和指定助力码被助力到这个数后，后面的账号不再助力它。 |
-| `XPJB_ASSIST_PRIORITY` | 可选，只给新品金榜用。指定被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。第一个号先助力作者，后面的号先助力第一个号，再按这个名单。助力码缓存在 `cache/xpjb_invite.json`，已有的不覆盖。 |
+| `XPJB_ASSIST_PRIORITY` | 可选，只给新品金榜用。指定被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。不填则用 `JD_ASSIST_PIN`。第一个号先助力作者，后面的号先助力第一个号，再按这个名单。助力码缓存在 `cache/xpjb_invite.json`，已有的不覆盖。 |
 | `XPJB_ASSIST_CODE` | 可选，只给新品金榜用。直接指定被助力的助力码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `shareUuid` 的分享链接。排在优先 pin 之后。和自己缓存里的助力码相同则跳过。 |
 | `XPJB_ASSIST_TIMES` | 可选，只给新品金榜用。每个助力码最多被助力成功的次数。不填则 5 次。作者、第一个号、优先 pin 和指定助力码被助力到这个数后，后面的账号不再助力它。 |
-| `PLANT_ASSIST_PRIORITY` | 可选，只给种豆得豆用。被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。第一个号先助力作者，再按这个名单。邀请码缓存在 `cache/plant_invite.json`，已有的不覆盖。 |
+| `PLANT_ASSIST_PRIORITY` | 可选，只给种豆得豆用。被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。不填则用 `JD_ASSIST_PIN`。第一个号先助力作者，再按这个名单。邀请码缓存在 `cache/plant_invite.json`，已有的不覆盖。 |
 | `PLANT_ASSIST_CODE` | 可选，只给种豆得豆用。直接指定被助力的助力码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `inviter` 的分享链接。排在优先 pin 之后。和自己缓存里的助力码相同则跳过。 |
 | `PLANT_ASSIST_TIMES` | 可选，只给种豆得豆用。每个助力码最多被助力成功的次数。不填则 17 次。作者、优先 pin 和指定助力码被助力到这个数后，后面的账号不再助力它。 |
 | `AUCTION_GUESS_RANDOM` | 可选，只给京豆拍卖用。设为 1 时，题目里没有正确答案就从选项里随便猜。不设就只在题目带了正确答案时才猜。 |

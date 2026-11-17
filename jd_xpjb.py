@@ -2,7 +2,7 @@
 '''
 new Env('新品金榜');
 49 0 * * * jd_xpjb.py
-版本：20261115
+版本：20261117
 '''
 import os
 import sys
