@@ -48,6 +48,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_jdpm.py            | 京豆拍卖     |
 | jd_jdtj.py            | 京东特价     |
 | jd_jdxy.py            | 京东校园     |
+| jd_joyyj.py           | JOY游记    |
 | jd_jrby.py            | 京融捕鱼     |
 | jd_jrdl.py            | 金融集电量    |
 | jd_jrld.py            | 金融领豆     |
