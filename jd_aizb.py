@@ -2,7 +2,7 @@
 '''
 new Env('AI装备');
 21 0 * * * jd_aizb.py
-版本：20261115
+版本：20261119
 '''
 import os
 import sys
