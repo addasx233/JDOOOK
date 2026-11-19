@@ -70,7 +70,6 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_wmjq.py            | 外卖抢金券    |
 | jd_wyqdzx.py          | 网页签到中心   |
 | jd_xpjb.py            | 新品金榜     |
-| jd_yyy.py             | 摇一摇得京豆   |
 | jd_zddd.py            | 种豆得豆     |
 | jd_zhf.py             | 赚话费      |
 | jd_zjd.py             | 9.9包邮砸金蛋 |
@@ -81,6 +80,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | --- | --- |
 | outdate/jd_klhb.py | 快乐红包 |
 | outdate/jd_sjds.py | 晒家大赛 |
+| outdate/jd_yyy.py | 摇一摇得京豆 |
 
 各活动脚本跑完一个账号后，把这次领到的京豆和红包加进 `cache/earnings/<pt_pin>.json`。东东农场和东东农场转盘同时记领到的水滴。种豆得豆和守护豆田同时记收进成长值的收获值，统计里显示为 `🟢xN`。一个账号一个文件，同一天多次运行会累加，只保留最近三天。`jd_sytj.py` 按脚本打印这些记录，并删掉三天前的日期。
 
