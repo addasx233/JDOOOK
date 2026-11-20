@@ -61,6 +61,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_kdxg.py            | 快递小哥     |
 | jd_lqzx.py            | 领券中心     |
 | jd_lsxd.py            | 零散小豆     |
+| jd_mdll.py            | 美的浏览     |
 | jd_mobileFarm.py      | 东东农场     |
 | jd_nczp.py            | 东东农场转盘   |
 | jd_nygf.py            | 能源工坊     |
