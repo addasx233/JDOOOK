@@ -2,7 +2,7 @@
 '''
 new Env('快递小哥');
 18 9 * * * jd_kdxg.py
-版本：20261119
+版本：20261120
 '''
 import os
 import sys
