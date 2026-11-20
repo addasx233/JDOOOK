@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
-new Env('家居馆');
-27 16 * * * jd_jjg.py
-版本：20261119
+new Env('拍拍二手自营');
+47 14 * * * jd_ppes.py
+版本：20261120
 '''
 import os
 import sys

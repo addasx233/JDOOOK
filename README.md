@@ -24,7 +24,7 @@
 
 **守护豆田还要定位**：`area`、`longitude`、`latitude`。解析 curl 或 HAR 时写入账号缓存。请求表单里有 `area`、`lng`、`lat` 就用这三项。没有时从 Referer，或请求体 `fullUrl` 里的 `tttparams` 取：那段是带前缀的 base64 JSON，结尾被干扰码弄坏时丢掉最后一个字段再解。`gps_area`（没有就用 `un_area`、`lbsArea`）写入 `area`，`lng`、`lat` 写入经纬度。`posLng`、`gLng` 是收货地址，不取。缺任何一个，守护豆田打印并跳过该账号，其它脚本不读这三项。
 
-**快递小哥还要微信 unionId**（抓包正文里的 `unionId`，不是 `shareUnionId`）。同一份 HAR 里只有一个 `pt_pin` 时写入这个账号。分号配置可以写 `unionId=`。也可以用环境变量 `KDXG_UNIONID`，格式 `pt_pin=unionId`，用 `&` 或换行分隔。缺了打印并跳过该账号，其它脚本不读。分号拼接时也可以直接写 `area`、`lng`、`lat`（或 `longitude`、`latitude`），或者写 `tttparams`。同一段里有 `tttparams` 时用它解出的实时定位。`posLng`、`homeLng` 是收货地址，不取。这段只有定位、没有其它设备字段时，仍用该账号已有的缓存，只补上定位。
+**快递小哥还要微信 unionId**（抓包正文里的 `unionId`，不是 `shareUnionId`）。同一份 HAR 里只有一个 `pt_pin` 时写入这个账号。分号配置可以写 `unionId=`。也可以用环境变量 `KDXG_UNIONID`，格式 `pt_pin=unionId`，用 `&` 或换行分隔。缺了打印并跳过该账号，其它脚本不读。
 
 `screen`、`openudid` 可以不写。没有 `openudid` 时用 `uuid`。`h5st` 每次请求现签，不写进缓存。
 
@@ -64,6 +64,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_mobileFarm.py      | 东东农场     |
 | jd_nczp.py            | 东东农场转盘   |
 | jd_nygf.py            | 能源工坊     |
+| jd_ppes.py            | 拍拍二手自营   |
 | jd_qyzxld.py          | 权益中心领豆   |
 | jd_qzqd.py            | 圈子签到     |
 | jd_rankVote.py        | 排行榜做任务   |
@@ -74,6 +75,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_ttgjd.py           | 天天挂京豆    |
 | jd_wmjq.py            | 外卖抢金券    |
 | jd_wyqdzx.py          | 网页签到中心   |
+| jd_yhfg.py            | 月黑风高     |
 | jd_xpjb.py            | 新品金榜     |
 | jd_zddd.py            | 种豆得豆     |
 | jd_zhf.py             | 赚话费      |
@@ -112,6 +114,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | `PLANT_ASSIST_CODE` | 可选，只给种豆得豆用。直接指定被助力的助力码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `inviter` 的分享链接。排在优先 pin 之后。和自己缓存里的助力码相同则跳过。 |
 | `PLANT_ASSIST_TIMES` | 可选，只给种豆得豆用。每个助力码最多被助力成功的次数。不填则 17 次。作者、优先 pin 和指定助力码被助力到这个数后，后面的账号不再助力它。 |
 | `AUCTION_GUESS_RANDOM` | 可选，只给京豆拍卖用。设为 1 时，题目里没有正确答案就从选项里随便猜。不设就只在题目带了正确答案时才猜。 |
+| `KDXG_UNIONID` | 可选，只给快递小哥用。`pt_pin=微信unionId`，用 `&` 或换行分隔。不填则用账号缓存里的 unionId。写上后记进这个号的缓存。 |
 | `FARM_BROWSER` | 可选。Chrome / Chromium / Edge 的可执行文件路径。不填就自动找。 |
 | `JD_REQUEST_GAP` | 可选，所有脚本共用。每次请求成功后的额外等待秒数。不填则 3 秒。 |
 | `JD_PROXY_API` | 可选。代理提取接口的完整地址，返回一行 `ip:port`。每个账号开始时取一次。取失败只提示当前 IP 是不是不在白名单，然后不加代理直接运行。活动火爆或代理失效会重新取。连续火爆 3 次跳过当前账号。不填则直连。 |

@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 '''
-new Env('能源工坊');
-18 8 * * * jd_nygf.py
-版本：20261119
+new Env('JDG抽奖');
+53 3 * * * jd_jdg.py
+版本：20261117
 '''
 import os
 import sys
