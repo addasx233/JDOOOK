@@ -59,6 +59,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_jyzs.py            | 交易指数     |
 | jd_kbmy.py            | 看病买药     |
 | jd_kdxg.py            | 快递小哥     |
+| jd_lgjsh.py           | 流感季守护   |
 | jd_lqzx.py            | 领券中心     |
 | jd_lsxd.py            | 零散小豆     |
 | jd_mdll.py            | 美的浏览     |
@@ -78,6 +79,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_wyqdzx.py          | 网页签到中心   |
 | jd_yhfg.py            | 月黑风高     |
 | jd_xpjb.py            | 新品金榜     |
+| jd_zbcj.py            | 直播抽奖     |
 | jd_zddd.py            | 种豆得豆     |
 | jd_zhf.py             | 赚话费      |
 | jd_zjd.py             | 9.9包邮砸金蛋 |
@@ -116,6 +118,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | `PLANT_ASSIST_TIMES` | 可选，只给种豆得豆用。每个助力码最多被助力成功的次数。不填则 17 次。作者、优先 pin 和指定助力码被助力到这个数后，后面的账号不再助力它。 |
 | `AUCTION_GUESS_RANDOM` | 可选，只给京豆拍卖用。设为 1 时，题目里没有正确答案就从选项里随便猜。不设就只在题目带了正确答案时才猜。 |
 | `KDXG_UNIONID` | 可选，只给快递小哥用。`pt_pin=微信unionId`，用 `&` 或换行分隔。不填则用账号缓存里的 unionId。写上后记进这个号的缓存。 |
+| `LIVE_LOTTERY_URL` | 可选，只给直播抽奖用。直播间链接，可多行。一行里可以夹别的文字，有几个链接就认几个，可以是 u.jd.com 短链。不是直播间地址的内容跳过。 |
 | `FARM_BROWSER` | 可选。Chrome / Chromium / Edge 的可执行文件路径。不填就自动找。 |
 | `JD_REQUEST_GAP` | 可选，所有脚本共用。每次请求成功后的额外等待秒数。不填则 3 秒。 |
 | `JD_PROXY_API` | 可选。代理提取接口的完整地址，返回一行 `ip:port`。每个账号开始时取一次。取失败只提示当前 IP 是不是不在白名单，然后不加代理直接运行。活动火爆或代理失效会重新取。连续火爆 3 次跳过当前账号。不填则直连。 |
