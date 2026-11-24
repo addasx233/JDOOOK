@@ -42,6 +42,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_beans_7days_new.py | 豆子7天统计   |
 | jd_byzl.py            | 捕鱼助力     |
 | jd_cjyhl.py           | 抽奖赢好礼    |
+| jd_cply.py            | 测评乐园     |
 | jd_hdyx.py            | 互动游戏     |
 | jd_hlxyj.py           | 好礼许愿机    |
 | jd_jdjx.py            | 京东惊喜     |
