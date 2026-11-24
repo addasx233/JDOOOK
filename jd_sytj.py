@@ -2,7 +2,7 @@
 '''
 new Env('收益统计');
 30 23 * * * jd_sytj.py
-版本：20261120
+版本：20261124
 '''
 import os
 import sys
