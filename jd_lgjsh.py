@@ -2,7 +2,7 @@
 '''
 new Env('流感季守护');
 28 9 * * * jd_lgjsh.py
-版本：20261123
+版本：20261127
 '''
 import os
 import sys

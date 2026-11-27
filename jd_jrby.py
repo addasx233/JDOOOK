@@ -2,7 +2,7 @@
 '''
 new Env('京融捕鱼');
 48 7 * * * jd_jrby.py
-版本：20261115
+版本：20261127
 '''
 import os
 import sys
