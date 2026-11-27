@@ -2,7 +2,7 @@
 '''
 new Env('好礼许愿机');
 16 12 * * * jd_hlxyj.py
-版本：20261119
+版本：20261127
 '''
 import os
 import sys

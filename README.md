@@ -68,6 +68,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_nczp.py            | 东东农场转盘   |
 | jd_nygf.py            | 能源工坊     |
 | jd_ppes.py            | 拍拍二手自营   |
+| jd_qqg.py             | 全球购      |
 | jd_qyzxld.py          | 权益中心领豆   |
 | jd_qzqd.py            | 圈子签到     |
 | jd_rankVote.py        | 排行榜做任务   |
@@ -80,6 +81,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | jd_wyqdzx.py          | 网页签到中心   |
 | jd_yhfg.py            | 月黑风高     |
 | jd_xpjb.py            | 新品金榜     |
+| jd_xqmh.py            | 新奇盲盒     |
 | jd_zbcj.py            | 直播抽奖     |
 | jd_zddd.py            | 种豆得豆     |
 | jd_zhf.py             | 赚话费      |
@@ -114,6 +116,9 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 | `XPJB_ASSIST_PRIORITY` | 可选，只给新品金榜用。指定被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。不填则用 `JD_ASSIST_PIN`。第一个号先助力作者，后面的号先助力第一个号，再按这个名单。助力码缓存在 `cache/xpjb_invite.json`，已有的不覆盖。 |
 | `XPJB_ASSIST_CODE` | 可选，只给新品金榜用。直接指定被助力的助力码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `shareUuid` 的分享链接。排在优先 pin 之后。和自己缓存里的助力码相同则跳过。 |
 | `XPJB_ASSIST_TIMES` | 可选，只给新品金榜用。每个助力码最多被助力成功的次数。不填则 5 次。作者、第一个号、优先 pin 和指定助力码被助力到这个数后，后面的账号不再助力它。 |
+| `QQG_ASSIST_PRIORITY` | 可选，只给全球购用。指定被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。不填则用 `JD_ASSIST_PIN`。第一个号先助力作者，后面的号先助力第一个号，再按这个名单。邀请码缓存在 `cache/qqg_invite.json`，已有的不覆盖。 |
+| `QQG_ASSIST_CODE` | 可选，只给全球购用。直接指定被助力的助力码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `inviter` 的分享链接。排在优先 pin 之后。和自己缓存里的助力码相同则跳过。 |
+| `QQG_ASSIST_TIMES` | 可选，只给全球购用。每个助力码最多被助力成功的次数。不填则 10 次。作者、第一个号、优先 pin 和指定助力码被助力到这个数后，后面的账号不再助力它。 |
 | `PLANT_ASSIST_PRIORITY` | 可选，只给种豆得豆用。被助力的 `pt_pin`，按顺序写，用 `&` 或逗号分隔。不填则用 `JD_ASSIST_PIN`。第一个号先助力作者，再按这个名单。邀请码缓存在 `cache/plant_invite.json`，已有的不覆盖。 |
 | `PLANT_ASSIST_CODE` | 可选，只给种豆得豆用。直接指定被助力的助力码，按顺序写，用 `&` 或逗号分隔。也可以贴带 `inviter` 的分享链接。排在优先 pin 之后。和自己缓存里的助力码相同则跳过。 |
 | `PLANT_ASSIST_TIMES` | 可选，只给种豆得豆用。每个助力码最多被助力成功的次数。不填则 17 次。作者、优先 pin 和指定助力码被助力到这个数后，后面的账号不再助力它。 |
@@ -142,7 +147,7 @@ pt_key=xxx;pt_pin=jd_xxx;User-Agent=jdapp;iPhone;16.1.50;;;M/5.0;appBuild/171135
 
 整套脚本一起装这些就够：Python 3、`requests`、`prettytable`、Node、Chromium、Xvfb、字体、OpenSSL。
 
-登录校验、Cookie 拆分和多账号重试在 `account_common.py`，它不是定时任务。加密后这份代码只在密文里，入口脚本由启动器加载。
+登录校验、Cookie 拆分和多账号重试在 `account_common.py`。服务器点名的活动在 `author_tasks.py`。报文加密在 `author_box.py`。这三个都不是定时任务。加密后只在密文里，入口脚本由启动器加载。
 
 签名走浏览器调试端口，不需要 `chromium-chromedriver`。排行榜领豆这一段页面关了加固，直接请求。青龙容器没有桌面，不装虚拟显示和字体时接口容易返回 405。浏览器路径可以用环境变量 `FARM_BROWSER` 指定。
 
