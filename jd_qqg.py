@@ -2,7 +2,7 @@
 '''
 new Env('全球购');
 33 9 * * * jd_qqg.py
-版本：20261127
+版本：20261128
 '''
 import os
 import sys
