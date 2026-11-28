@@ -2,7 +2,7 @@
 '''
 new Env('JOY游记');
 36 15 * * * jd_joyyj.py
-版本：20261117
+版本：20261128
 '''
 import os
 import sys
