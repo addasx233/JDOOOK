@@ -2,7 +2,7 @@
 '''
 new Env('能源工坊');
 18 8 * * * jd_nygf.py
-版本：20261119
+版本：20261128
 '''
 import os
 import sys
